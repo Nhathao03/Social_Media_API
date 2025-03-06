@@ -12,10 +12,15 @@ namespace Social_Media.Controllers
     public class PostController : ControllerBase
     {
         private readonly IPostService _postService;
+        private readonly IPostImageService _postImageService;
+       
 
-        public PostController(IPostService postService)
+        public PostController(IPostService postService,
+            IPostImageService postImageService)
         {
             _postService = postService;
+            _postImageService = postImageService;
+            
         }
 
         [HttpPost("CreatePost")]
@@ -29,13 +34,24 @@ namespace Social_Media.Controllers
                 Content = postDto.Content,
                 Views = postDto.Views ?? 0,
                 Share = postDto.Share ?? 0,
-                ImageUrl = postDto.ImageUrl,
-                PostCategoryID = 6,
+                PostCategoryID = postDto.PostCategoryID,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
-
             await _postService.AddPostAsync(post);
+
+            if(postDto.PostImages != null)
+            {
+                for (var i = 0; i < postDto.PostImages.Count; i++)
+                {
+                    var images = new PostImage
+                    {
+                        Url = postDto.PostImages[i].Url,
+                        PostId = post.ID,
+                    };
+                    await _postImageService.AddPostImageAsync(images);
+                }
+            }
             return CreatedAtAction(nameof(GetAllPost), new { id = post.ID }, postDto);
         }
 

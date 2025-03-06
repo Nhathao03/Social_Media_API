@@ -10,10 +10,9 @@ namespace Social_Media.Models
 		public string? Content { get; set; }
 		public int? Views { get; set; }
         public int? Share { get; set; }
-        public string? ImageUrl { get; set; }
         public List<PostImage>? PostImages { get; set; }
         public int PostCategoryID { get; set; }
-		public PostCategory? PostCategory { get; set; }
+		public PostCategory? PostCategory { get; set; } 
 		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 		public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 

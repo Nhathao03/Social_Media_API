@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Social_Media.BAL;
 using Social_Media.DAL;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Social_Media
 {
@@ -19,9 +20,19 @@ namespace Social_Media
             builder.Services.AddScoped<PostRepository>();
             builder.Services.AddScoped<PostCategoryRepository>();
             builder.Services.AddScoped<UserRepository>();
+            builder.Services.AddScoped<PostImageRepository>();
+            builder.Services.AddScoped<CommentRepository>();
+            builder.Services.AddScoped<RoleCheckRepository>();
+            builder.Services.AddScoped<RoleRepository>();
+            builder.Services.AddScoped<LikeRepository>();
             builder.Services.AddScoped<IPostService, PostService>();
             builder.Services.AddScoped<IPostCategoryService, PostCategoryService>();
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IPostImageService, PostImageService>();
+            builder.Services.AddScoped<ICommentService, CommentService>();
+            builder.Services.AddScoped<IRoleService, RoleService>();
+            builder.Services.AddScoped<IRoleCheckService, RoleCheckService>();
+            builder.Services.AddScoped<ILikeService, LikeService>();
 
             builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
             // Add services to the container.
@@ -29,6 +40,10 @@ namespace Social_Media
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
+            options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
 
             builder.Services.AddCors(options =>
             {

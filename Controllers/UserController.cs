@@ -10,13 +10,18 @@ namespace Social_Media.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        public UserController(IUserService userService)
+        private readonly IRoleCheckService _roleCheckService;
+        private readonly IRoleService _roleService;
+        public UserController(IUserService userService, IRoleCheckService roleCheckService, IRoleService roleService)
         {
             _userService = userService;
+            _roleCheckService = roleCheckService;
+            _roleService = roleService;
         }
 
+        //Register acccount
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterAccount([FromBody] RegisterDTO model)
+        public async Task<IActionResult> RegisterAccount([FromBody] RegisterDTO model) 
         {
             if (model == null || string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
                 return BadRequest("Invalid input data.");
@@ -34,6 +39,7 @@ namespace Social_Media.Controllers
             return Ok(new { message = "User registered successfully!" });
         }
 
+        //Check login account
         [HttpPost("login")]
         public async Task<IActionResult> LoginAccount([FromBody] LoginDTO model)
         {
@@ -48,6 +54,7 @@ namespace Social_Media.Controllers
 
             if (user.Password != model.Password) 
                 return Unauthorized("Incorrect password.");
+            //string directURL =
 
             return Ok(new { Message = "Login successful.", token = user.Id });
         }

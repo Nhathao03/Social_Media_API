@@ -9,7 +9,7 @@ namespace Social_Media.Models
 		public int ID { get; set; }
 		public int PostId { get; set; }
 		public string UserId { get; set; }
-		public int Likes { get; set; }
+		public int? Likes { get; set; }
 		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
 		// Navigation properties
