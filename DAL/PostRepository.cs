@@ -14,12 +14,12 @@ namespace Social_Media.DAL
 
         public async Task<IEnumerable<Post>> GetAllPost()
         {
-            return await _context.posts.Include(p => p.Comments).Include(p => p.Likes).Include(p => p.PostCategory).ToListAsync();
+            return await _context.posts.Include(p => p.Comments).Include(p => p.Likes).Include(p => p.PostCategory).Include(p => p.PostImages).ToListAsync();
         }
 
         public async Task<Post> GetPostById(int id)
         {
-            return await _context.posts.Include(p => p.Comments).Include(p => p.Likes).Include(p => p.PostCategory).FirstOrDefaultAsync(p => p.ID == id);
+            return await _context.posts.Include(p => p.Comments).Include(p => p.Likes).Include(p => p.PostCategory).Include(p => p.PostImages).FirstOrDefaultAsync(p => p.ID == id);
         }
 
         public async Task AddPost(Post post)
@@ -43,5 +43,6 @@ namespace Social_Media.DAL
                 await _context.SaveChangesAsync();
             }
         }
+
     }
 }
