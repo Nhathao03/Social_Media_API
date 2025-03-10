@@ -43,6 +43,12 @@ namespace Social_Media.DAL
                 _context.likes.Remove(like);
                 await _context.SaveChangesAsync();
             }
-        }  
+        }
+
+        public async Task<Like?> GetLikeByUserAndPost(string userId, int postId)
+        {
+            return await _context.likes.FirstOrDefaultAsync(l => l.UserId == userId && l.PostId == postId);
+        }
+
     }
 }

@@ -9,5 +9,6 @@ namespace Social_Media.DAL
         Task AddRoleCheck(RoleCheck roleCheck);
         Task UpdateRoleCheck(RoleCheck roleCheck);
         Task DeleteRoleCheck(int id);
+        Task<bool> IsAdminAsync(string userId);
     }
 }

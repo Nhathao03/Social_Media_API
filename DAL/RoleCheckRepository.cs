@@ -44,5 +44,22 @@ namespace Social_Media.DAL
             }
         }
 
+        public async Task<bool> IsAdminAsync(string userId)
+        {
+            var adminRole = await _context.roles
+                .FirstOrDefaultAsync(r => r.Name.Equals("Admin"));
+
+            if (adminRole == null) return false; // No "Admin" role found
+
+            // Check if user has any role assigned
+            var userRoleCheck = await _context.rolesCheck
+                .FirstOrDefaultAsync(rc => rc.UserID == userId);
+
+            if (userRoleCheck == null || string.IsNullOrEmpty(userRoleCheck.RoleID))
+                return false; // User has no role assigned, or role is NULL
+
+            return userRoleCheck.RoleID == adminRole.Id.ToString();
+        }
+
     }
 }
