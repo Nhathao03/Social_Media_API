@@ -10,5 +10,6 @@ namespace Social_Media.BAL
         Task AddRoleCheckAsync(RoleCheck roleCheck);
         Task UpdateRoleCheckAsync(RoleCheck roleCheck);
         Task DeleteRoleCheckAsync(int id);
+        Task<bool> IsAdminAsync(string userId);
     }
 }

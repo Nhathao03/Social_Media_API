@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Social_Media.BAL;
 using Social_Media.Models;
@@ -13,7 +14,6 @@ namespace Social_Media.Controllers
     {
         private readonly IPostService _postService;
         private readonly IPostImageService _postImageService;
-       
 
         public PostController(IPostService postService,
             IPostImageService postImageService)

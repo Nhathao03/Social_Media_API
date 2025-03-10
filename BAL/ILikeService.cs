@@ -10,5 +10,7 @@ namespace Social_Media.BAL
         Task AddLikeAsync(Like like);
         Task UpdateLikeAsync(Like like);
         Task DeleteLikeAsync(int id);
+        Task<Like?> GetLikeByUserAndPostAsync(string userId, int postId);
+
     }
 }

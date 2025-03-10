@@ -19,8 +19,17 @@ namespace Social_Media.Controllers
         [HttpPost("AddLike")]
         public async Task<IActionResult> AddLike([FromBody] LikeDTO likeDTO)
         {
-            if (likeDTO == null) return BadRequest();
+            if (likeDTO == null ) return BadRequest();
 
+            // Check userID and postID
+            var existingLike = await _likeService.GetLikeByUserAndPostAsync(likeDTO.UserID, likeDTO.postID);
+            if (existingLike != null)
+            {
+                deleteLikeByID(existingLike.ID);
+                return BadRequest("Deleted like this post.");
+            }
+
+            
             var like = new Like
             {
                 UserId = likeDTO.UserID,

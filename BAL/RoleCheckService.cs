@@ -37,5 +37,10 @@ namespace Social_Media.BAL
         {
             await _roleCheckRepository.DeleteRoleCheck(id);
         }
+
+        public async Task<bool> IsAdminAsync(string userId)
+        {
+            return await _roleCheckRepository.IsAdminAsync(userId);
+        }
     }
 }

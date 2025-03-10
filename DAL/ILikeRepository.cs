@@ -9,5 +9,6 @@ namespace Social_Media.DAL
         Task AddLike(Like like);
         Task UpdateLike(Like like);
         Task DeleteLike(int id);
+        Task<Like?> GetLikeByUserAndPost(string userId, int postId);
     }
 }

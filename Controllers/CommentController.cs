@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Extensions.Hosting;
 using Social_Media.BAL;
 using Social_Media.Models;
 using Social_Media.Models.DTO;
@@ -59,5 +60,19 @@ namespace Social_Media.Controllers
             await _commentService.DeleteCommentAsync(id);
             return NoContent();
         }
+
+        [HttpPut("AddLikeComment/{id}")]
+        public async Task<IActionResult> AddLikeComment(int id)
+        {
+            var commentData = await _commentService.GetCommentByIdAsync(id);
+            if (commentData == null) return NotFound("Comment not found.");
+
+            commentData.Sticker += 1; 
+
+            await _commentService.UpdateCommentAsync(commentData);
+
+            return NoContent();
+        }
+
     }
 }

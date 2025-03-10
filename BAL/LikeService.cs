@@ -37,5 +37,12 @@ namespace Social_Media.BAL
         {
             await _likeRepository.DeleteLike(id);
         } 
+
+        public async Task<Like?> GetLikeByUserAndPostAsync(string userId, int postId)
+        {
+           var data = await _likeRepository.GetLikeByUserAndPost(userId, postId);
+            return data;
+        }
+
     }
 }

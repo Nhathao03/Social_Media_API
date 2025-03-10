@@ -45,18 +45,26 @@ namespace Social_Media.Controllers
         {
             if (model == null || string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
                 return BadRequest("Invalid input data.");
-
             var user = (await _userService.GetAllUsersAsync())
                         .FirstOrDefault(u => u.Email == model.Email);
-
-            if (user == null)
+            if (user == null )
                 return Unauthorized("Email not found.");
 
             if (user.Password != model.Password) 
                 return Unauthorized("Incorrect password.");
-            //string directURL =
+            // Check user role
+            string redirectURL = "/home"; 
+            if (await _roleCheckService.IsAdminAsync(user.Id)) // IsAdminAsync checks if the user is an admin
+            {
+                redirectURL = "/admin";
+            }
 
-            return Ok(new { Message = "Login successful.", token = user.Id });
+            return Ok(new
+            {
+                Message = "Login successful.",
+                Token = user.Id,
+                RedirectURL = redirectURL
+            });
         }
 
         [HttpGet("GetAllUser")]
