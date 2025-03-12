@@ -24,7 +24,6 @@ namespace Social_Media.Controllers
             if (addressDTO == null) return BadRequest();
             await _addressService.AddAddressAsync(addressDTO);
             return Ok("add success !");
-            //return CreatedAtAction(nameof(GetAllPost), new { id = post.ID }, postDto);
         }
 
         [HttpGet("getAllAddress")]

@@ -21,6 +21,7 @@ namespace Social_Media.DAL
         public DbSet<Type_Friends> type_friends { get; set; }
         public DbSet<Follower> followers { get; set; }
         public DbSet<Following> followings { get; set; }
+        public DbSet<FriendRequest> friendRequests { get; set; }
 
     }
 }

@@ -27,6 +27,7 @@ namespace Social_Media
             builder.Services.AddScoped<LikeRepository>();
             builder.Services.AddScoped<AddressRepository>();
             builder.Services.AddScoped<TypeFriendsRepository>();
+            builder.Services.AddScoped<FriendRequestRepository>();
             builder.Services.AddScoped<IPostService, PostService>();
             builder.Services.AddScoped<IPostCategoryService, PostCategoryService>();
             builder.Services.AddScoped<IUserService, UserService>();
@@ -37,6 +38,7 @@ namespace Social_Media
             builder.Services.AddScoped<ILikeService, LikeService>();
             builder.Services.AddScoped<IAddressService, AddressService>();
             builder.Services.AddScoped<ITypeFriendsService, TypeFriendsService>();
+            builder.Services.AddScoped<IFriendRequestService, FriendRequestService>();
 
             builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
             // Add services to the container.
