@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <Folder Include="Image\ImagePost\" />
-    <Folder Include="Migrations\" />
     <Folder Include="wwwroot\comments\images\" />
     <Folder Include="wwwroot\posts\image\" />
   </ItemGroup>

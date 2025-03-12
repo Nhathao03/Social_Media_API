@@ -28,17 +28,7 @@ namespace Social_Media.Controllers
                 deleteLikeByID(existingLike.ID);
                 return BadRequest("Deleted like this post.");
             }
-
-            
-            var like = new Like
-            {
-                UserId = likeDTO.UserID,
-                PostId = likeDTO.postID,
-                CreatedAt = DateTime.UtcNow,
-            };
-
-            await _likeService.AddLikeAsync(like);
-
+            await _likeService.AddLikeAsync(likeDTO);
             return Ok("Add new like post sucess !");
         }
 

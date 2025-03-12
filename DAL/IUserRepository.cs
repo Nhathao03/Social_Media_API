@@ -7,9 +7,9 @@ namespace Social_Media.DAL
     {
         Task<IEnumerable<User>> GetAllUser();
         Task<User> GetUserById(string id);
-        Task AddUser(User user);
         Task UpdateUser(User user);
         Task DeleteUser(string id);
         Task RegisterAccount(RegisterDTO registerDTO);
+        Task<List<User>> FindUser(string stringData);
     }
 }

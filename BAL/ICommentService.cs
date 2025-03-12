@@ -1,4 +1,5 @@
 ﻿using Social_Media.Models;
+using Social_Media.Models.DTO;
 
 namespace Social_Media.BAL
 {
@@ -6,7 +7,7 @@ namespace Social_Media.BAL
     {
         Task<IEnumerable<Comment>> GetAllCommentsAsync();
         Task<Comment> GetCommentByIdAsync(int id);
-        Task AddCommentAsync(Comment comment);
+        Task AddCommentAsync(CommentDTO comment);
         Task UpdateCommentAsync(Comment comment);
         Task DeleteCommentAsync(int id);
     }

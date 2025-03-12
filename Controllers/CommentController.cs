@@ -23,18 +23,7 @@ namespace Social_Media.Controllers
         public async Task<IActionResult> CreateNewComment([FromBody] CommentDTO commentDTO)
         {
             if (commentDTO == null) return BadRequest();
-            var comment = new Comment
-            {
-                UserId = commentDTO.userID,
-                PostId = commentDTO.postID,
-                Sticker = commentDTO.sticker,
-                Content = commentDTO.Content,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                Image = commentDTO.ImageUrl ?? null,
-            };
-
-            await _commentService.AddCommentAsync(comment);
+            
             return Ok("Create new comment success !");
         }
 
@@ -46,7 +35,7 @@ namespace Social_Media.Controllers
             return Ok(comments);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("getCommentByID/{id}")]
         public async Task<IActionResult> getCommentByID(int id)
         {
             var comment = await _commentService.GetCommentByIdAsync(id);
@@ -54,7 +43,7 @@ namespace Social_Media.Controllers
             return Ok(comment);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("deleteCommentByID/{id}")]
         public async Task<IActionResult> deleteCommentByID (int id)
         {
             await _commentService.DeleteCommentAsync(id);

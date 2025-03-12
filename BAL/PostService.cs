@@ -36,5 +36,11 @@ namespace Social_Media.BAL
         {
             await _repository.DeletePost(id);
         }
+
+        //get Posts by userID
+        public async Task<IEnumerable<Post>> GetPostsByUserIDAsync(string userID)
+        {
+           return await _repository.GetPostsByUserID(userID);
+        }
     }
 }

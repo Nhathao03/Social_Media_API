@@ -16,5 +16,11 @@ namespace Social_Media.DAL
         public DbSet<UserLogins> usersLogins { get; set; }
         public DbSet<Role> roles { get; set; }
         public DbSet<RoleCheck> rolesCheck { get; set; }
+        public DbSet<Address> addresses { get; set; }
+        public DbSet<Friends> friends { get; set; }
+        public DbSet<Type_Friends> type_friends { get; set; }
+        public DbSet<Follower> followers { get; set; }
+        public DbSet<Following> followings { get; set; }
+
     }
 }

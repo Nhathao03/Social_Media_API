@@ -36,10 +36,10 @@ namespace Social_Media.DAL
 
         public async Task DeletePostCategory(int id)
         {
-            var post = await _context.posts.FindAsync(id);
+            var post = await _context.post_category.FindAsync(id);
             if (post != null)
             {
-                _context.posts.Remove(post);
+                _context.post_category.Remove(post);
                 await _context.SaveChangesAsync();
             }
         }

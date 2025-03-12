@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Social_Media.Models;
+using Social_Media.Models.DTO;
 using System.Xml.Linq;
 
 namespace Social_Media.DAL
@@ -23,9 +24,20 @@ namespace Social_Media.DAL
             return await _context.comments.FirstOrDefaultAsync(p => p.ID == id);
         }
 
-        public async Task AddComment(Comment comment)
+        public async Task AddComment(CommentDTO commentDTO)
         {
-            _context.comments.AddAsync(comment);
+            var comment = new Comment
+            {
+                UserId = commentDTO.userID,
+                PostId = commentDTO.postID,
+                Sticker = commentDTO.sticker,
+                Content = commentDTO.Content,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                Image = commentDTO.ImageUrl ?? null,
+            };
+
+            _context.AddAsync(comment);
             await _context.SaveChangesAsync();
         }
 
