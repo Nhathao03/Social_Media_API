@@ -9,5 +9,6 @@ namespace Social_Media.BAL
         Task AddPostAsync(Post post);
         Task UpdatePostAsync(Post post);
         Task DeletePostAsync(int id);
+        Task<IEnumerable<Post>> GetPostsByUserIDAsync(string userID);
     }
 }

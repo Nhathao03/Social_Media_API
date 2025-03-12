@@ -7,9 +7,9 @@ namespace Social_Media.BAL
     {
         Task<IEnumerable<User>> GetAllUsersAsync();
         Task<User> GetUserByIdAsync(string id);
-        Task AddUserAsync(User user);
         Task UpdateUserAsync(User user);
         Task DeleteUserAsync(string id);
         Task RegisterAccountAsync (RegisterDTO registerDTO);
+        Task<List<User>> FindUserAsync(string stringData);
     }
 }

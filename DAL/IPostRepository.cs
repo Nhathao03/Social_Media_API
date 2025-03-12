@@ -9,5 +9,6 @@ namespace Social_Media.DAL
         Task AddPost(Post post);
         Task UpdatePost(Post post);
         Task DeletePost(int id);
+        Task<IEnumerable<Post>> GetPostsByUserID(string userID);
     }
 }

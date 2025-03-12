@@ -80,6 +80,19 @@ namespace Social_Media.Controllers
             var getUser = await _userService.GetUserByIdAsync(userID);
             return Ok(getUser);
         }
-       
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            return Ok(new { message = "Logout successful" });
+        }
+
+        [HttpGet("findUser/{stringData}")]
+        public async Task<IActionResult> FindUser(string stringData)
+        {
+            var user = await _userService.FindUserAsync(stringData);
+            if (user == null) return NotFound();
+            return Ok(user);
+        }
     }
 }

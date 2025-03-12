@@ -44,5 +44,11 @@ namespace Social_Media.DAL
             }
         }
 
+        //Get posts by userID
+        public async Task<IEnumerable<Post>> GetPostsByUserID(string userID)
+        {
+           return await _context.posts.Include(p => p.Comments).Include(p => p.Likes).Include(p => p.PostCategory).Include(p => p.PostImages).Where(p => p.UserID == userID).ToListAsync();
+        }
+
     }
 }

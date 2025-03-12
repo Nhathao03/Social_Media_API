@@ -23,12 +23,6 @@ namespace Social_Media.DAL
             return await _context.users.FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task AddUser(User user)
-        {
-            _context.users.AddAsync(user);
-            await _context.SaveChangesAsync();
-        }
-
         public async Task UpdateUser(User user)
         {
             _context.users.Update(user);
@@ -45,6 +39,7 @@ namespace Social_Media.DAL
             }
         }
 
+        //Render userID
         private string GenerateUserID()
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -52,6 +47,7 @@ namespace Social_Media.DAL
               .Select(s => s[new Random().Next(s.Length)]).ToArray());
         }
 
+        //Register account
         public async Task RegisterAccount(RegisterDTO model)
         {
             var user = new User
@@ -62,6 +58,7 @@ namespace Social_Media.DAL
                 PhoneNumber = model.PhoneNumber,
                 Fullname = model.FullName,
                 Birth = model.Birth,
+                gender = model.gender,
             };
 
             var roleUser = new RoleCheck
@@ -74,5 +71,29 @@ namespace Social_Media.DAL
             _context.AddAsync(roleUser);
             await _context.SaveChangesAsync();
         }
+
+        //Find user by username || phonenumber || email
+        public async Task<List<User>> FindUser(string stringData)
+        {
+            return await _context.users
+                .Include(u => u.follower)
+                .Include(u => u.following)
+                .Where(u =>
+                    u.Email == stringData ||
+                    u.PhoneNumber.Contains(stringData) ||
+                    u.Fullname.Contains(stringData))
+                .Select(u => new User
+                {
+                    Id = u.Id,
+                    Fullname = u.Fullname,
+                    Email = u.Email,
+                    PhoneNumber = u.PhoneNumber,
+                    Avatar = u.Avatar,
+                    follower = u.follower,
+                    following = u.following
+                })
+                .ToListAsync();
+        }
+
     }
 }

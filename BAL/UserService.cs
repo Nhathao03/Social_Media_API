@@ -23,11 +23,6 @@ namespace Social_Media.BAL
             return await _userRepository.GetUserById(id);
         }
 
-        public async Task AddUserAsync(User user)
-        {
-            await _userRepository.AddUser(user);
-        }
-
         public async Task UpdateUserAsync(User user)
         {
             await _userRepository.UpdateUser(user);
@@ -41,6 +36,11 @@ namespace Social_Media.BAL
         {
             await _userRepository.RegisterAccount(registerDTO);
         }
- 
+
+        public async Task<List<User>> FindUserAsync(string stringData)
+        {
+            return await _userRepository.FindUser(stringData);
+        }
+
     }
 }

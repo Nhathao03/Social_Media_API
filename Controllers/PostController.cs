@@ -27,7 +27,6 @@ namespace Social_Media.Controllers
         public async Task<IActionResult> CreatePost([FromBody] PostDTO postDto)
         {
             if (postDto == null) return BadRequest();
-
             var post = new Post
             {
                 UserID = postDto.UserID,
@@ -63,7 +62,7 @@ namespace Social_Media.Controllers
             return Ok(posts);
         }
 
-        [HttpGet("{id}")] 
+        [HttpGet("getPostByID/{id}")] 
         public async Task<IActionResult> GetPostById(int id)
         {
             var post = await _postService.GetPostByIdAsync(id);
@@ -79,11 +78,20 @@ namespace Social_Media.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("deletePostByID/{id}")]
         public async Task<IActionResult> DeletePost(int id)
         {
             await _postService.DeletePostAsync(id);
             return NoContent();
         }
+
+        [HttpGet("getPostsByUserID/{userID}")]
+        public async Task<IActionResult> GetPostsByuserID(string userID)
+        {
+            var posts = await _postService.GetPostsByUserIDAsync(userID);
+            if (posts == null) return NotFound();
+            return Ok(posts);
+        }
+
     }
 }

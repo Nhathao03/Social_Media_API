@@ -23,7 +23,7 @@ namespace Social_Media.BAL
             return await _commentRepository.GetCommentById(id);
         }
 
-        public async Task AddCommentAsync(Comment comment)
+        public async Task AddCommentAsync(CommentDTO comment)
         {
             await _commentRepository.AddComment(comment);
         }
