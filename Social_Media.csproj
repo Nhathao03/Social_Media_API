@@ -27,6 +27,7 @@
   <ItemGroup>
     <Folder Include="wwwroot\comments\images\" />
     <Folder Include="wwwroot\posts\image\" />
+    <Folder Include="wwwroot\user\avatar\" />
   </ItemGroup>
 
 </Project>

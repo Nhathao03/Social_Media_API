@@ -1,6 +1,7 @@
 ﻿using Social_Media.DAL;
 using Social_Media.Models;
 using Social_Media.Models.DTO;
+using Social_Media.Models.DTO.AccountUser;
 
 namespace Social_Media.BAL
 {
@@ -42,5 +43,9 @@ namespace Social_Media.BAL
             return await _userRepository.FindUser(stringData);
         }
 
+        public async Task UpdatePersonalInformation (PersonalInformationDTO personalInformationDTO)
+        {
+            await _userRepository.UpdatePersonalInformation(personalInformationDTO);
+        }
     }
 }

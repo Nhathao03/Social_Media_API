@@ -10,5 +10,7 @@ namespace Social_Media.DAL
         Task AddFriendRequest(FriendRequestDTO FriendRequest);
         Task UpdateFriendRequest(FriendRequest FriendRequest);
         Task DeleteFriendRequest(int id);
+        Task<List<FriendRequest>> GetFriendRequestBySenderID(string id);
+        Task ConfirmRequest(int id);
     }
 }
