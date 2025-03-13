@@ -10,5 +10,7 @@ namespace Social_Media.BAL
         Task UpdateFriendRequestAsync(FriendRequest FriendRequest);
         Task DeleteFriendRequestAsync(int id);
         Task AddFriendRequestAsync(FriendRequestDTO FriendRequest);
+        Task<List<FriendRequest>> GetFriendRequestBySenderID(string id);
+        Task ConfirmRequest(int id);
     }
 }

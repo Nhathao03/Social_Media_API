@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Social_Media.Models;
 using Social_Media.Models.DTO;
+using Social_Media.Models.DTO.AccountUser;
 
 namespace Social_Media.DAL
 {
@@ -60,13 +61,11 @@ namespace Social_Media.DAL
                 Birth = model.Birth,
                 gender = model.gender,
             };
-
             var roleUser = new RoleCheck
             {
                 UserID = user.Id,
                 RoleID = "1",
             };
-
             _context.AddAsync(user);
             _context.AddAsync(roleUser);
             await _context.SaveChangesAsync();
@@ -95,5 +94,19 @@ namespace Social_Media.DAL
                 .ToListAsync();
         }
 
+        //Update personal information
+        public async Task UpdatePersonalInformation (PersonalInformationDTO personalInformationDTO)
+        {
+            if (personalInformationDTO == null) return;
+            var user = await _context.users.FindAsync(personalInformationDTO.userID);
+            if (user == null)
+            {
+                throw new KeyNotFoundException($"User with ID {personalInformationDTO.userID} not found.");
+            }
+            user.Fullname = personalInformationDTO.fullname;
+            user.Birth = personalInformationDTO.Birth;
+            user.Avatar = personalInformationDTO.avatar;
+            
+        }
     }
 }

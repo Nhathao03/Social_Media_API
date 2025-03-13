@@ -1,5 +1,6 @@
 ﻿using Social_Media.Models;
 using Social_Media.Models.DTO;
+using Social_Media.Models.DTO.AccountUser;
 
 namespace Social_Media.DAL
 {
@@ -11,5 +12,6 @@ namespace Social_Media.DAL
         Task DeleteUser(string id);
         Task RegisterAccount(RegisterDTO registerDTO);
         Task<List<User>> FindUser(string stringData);
+        Task UpdatePersonalInformation (PersonalInformationDTO personalInformationDTO);
     }
 }

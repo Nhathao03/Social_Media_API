@@ -45,6 +45,23 @@ namespace Social_Media.Controllers
             await _friendRequestService.DeleteFriendRequestAsync(id);
             return NoContent();
         }
+
+        [HttpGet("getFriendRequestsBySenderID/{id}")]
+        public async Task<IActionResult> getFriendRequestsBySenderID(string id)
+        {
+            if(id == null) return BadRequest();
+            var result = await _friendRequestService.GetFriendRequestBySenderID(id);
+            if(result == null) return NotFound();
+            return Ok(result);
+        }
+
+        [HttpPut("confirmRequest/{id}")]
+        public async Task<IActionResult> ConfirmRequest(int id)
+        {
+            if(id == null || id == 0) return BadRequest();
+            await _friendRequestService.ConfirmRequest(id);
+            return Ok("Accected success !");
+        }
     }
 
 }
