@@ -4,6 +4,9 @@ using Social_Media.BAL;
 using Social_Media.DAL;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Social_Media
 {
@@ -13,8 +16,25 @@ namespace Social_Media
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            var jwtSettings = builder.Configuration.GetSection("Jwt");
+            var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtSettings["Issuer"], // API phát hành token
+                        ValidAudience = jwtSettings["Audience"], // Frontend s? d?ng token
+                        IssuerSigningKey = new SymmetricSecurityKey(key)
+                    };
+                });
+
             builder.Services.AddDbContext<AppDbContext>(options =>
-     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // Register the PostRepository and PostService after DbContext
             builder.Services.AddScoped<PostRepository>();
@@ -28,6 +48,7 @@ namespace Social_Media
             builder.Services.AddScoped<AddressRepository>();
             builder.Services.AddScoped<TypeFriendsRepository>();
             builder.Services.AddScoped<FriendRequestRepository>();
+            builder.Services.AddScoped<FriendRepository>();
             builder.Services.AddScoped<IPostService, PostService>();
             builder.Services.AddScoped<IPostCategoryService, PostCategoryService>();
             builder.Services.AddScoped<IUserService, UserService>();
@@ -39,6 +60,7 @@ namespace Social_Media
             builder.Services.AddScoped<IAddressService, AddressService>();
             builder.Services.AddScoped<ITypeFriendsService, TypeFriendsService>();
             builder.Services.AddScoped<IFriendRequestService, FriendRequestService>();
+            builder.Services.AddScoped<IFriendsService, FriendService>();
 
             builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
             // Add services to the container.
@@ -50,7 +72,7 @@ namespace Social_Media
             builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
             options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
-
+            //CORS (Cross-Origin Resource Sharing) allow access API from other domain 
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
@@ -74,8 +96,8 @@ namespace Social_Media
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
-            app.UseAuthorization();
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapControllers();
 

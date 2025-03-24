@@ -1,4 +1,6 @@
-﻿using Social_Media.DAL;
+﻿using Microsoft.EntityFrameworkCore;
+using Social_Media.DAL;
+using Social_Media.Helpers;
 using Social_Media.Models;
 using Social_Media.Models.DTO;
 
@@ -23,9 +25,15 @@ namespace Social_Media.BAL
             return await _FriendRequestRepository.GetFriendRequestById(id);
         }
 
-        public async Task AddFriendRequestAsync(FriendRequestDTO FriendRequest)
+        public async Task AddFriendRequestAsync(FriendRequestDTO friendRequestDTO)
         {
-            await _FriendRequestRepository.AddFriendRequest(FriendRequest);
+             var request = new FriendRequest
+            {
+                SenderID = friendRequestDTO.SenderID,
+                ReceiverID = friendRequestDTO.ReceiverID,
+                status = (int)Constants.FriendRequestEnum.Pending,
+            };
+            await _FriendRequestRepository.AddFriendRequest(request);
         }
 
         public async Task UpdateFriendRequestAsync(FriendRequest FriendRequest)
@@ -42,9 +50,17 @@ namespace Social_Media.BAL
             return await _FriendRequestRepository.GetFriendRequestBySenderID(id);
         }
 
+        //REVISE THIS CODE
         public async Task ConfirmRequest(int id)
         {
-            await _FriendRequestRepository.ConfirmRequest(id);
+            var request = await _FriendRequestRepository.GetFriendRequestById(id);
+            if (request == null)
+            {
+                throw new KeyNotFoundException($"Friend request with ID {id} not found.");
+            }
+            request.status = (int)Constants.FriendRequestEnum.Accepted;
+            await _FriendRequestRepository.UpdateFriendRequest(request);
         }
+
     }
 }

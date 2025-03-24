@@ -23,16 +23,9 @@ namespace Social_Media.DAL
             return await _context.likes.FirstOrDefaultAsync(p => p.ID == id);
         }
 
-        public async Task AddLike(LikeDTO likeDTO)
-        {
-            var likeData = new Like
-            {
-                UserId = likeDTO.UserID,
-                PostId = likeDTO.postID,
-                CreatedAt = DateTime.UtcNow,
-            };
-
-            _context.AddAsync(likeData);
+        public async Task AddLike(Like like)
+        {          
+            _context.AddAsync(like);
             await _context.SaveChangesAsync();
         }
 

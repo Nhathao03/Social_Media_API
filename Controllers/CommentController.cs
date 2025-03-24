@@ -23,7 +23,7 @@ namespace Social_Media.Controllers
         public async Task<IActionResult> CreateNewComment([FromBody] CommentDTO commentDTO)
         {
             if (commentDTO == null) return BadRequest();
-            
+            await _commentService.AddCommentAsync(commentDTO);
             return Ok("Create new comment success !");
         }
 

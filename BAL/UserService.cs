@@ -1,4 +1,5 @@
-﻿using Social_Media.DAL;
+﻿using Microsoft.EntityFrameworkCore;
+using Social_Media.DAL;
 using Social_Media.Models;
 using Social_Media.Models.DTO;
 using Social_Media.Models.DTO.AccountUser;
@@ -8,10 +9,13 @@ namespace Social_Media.BAL
     public class UserService : IUserService
     {
         private readonly UserRepository _userRepository;
+        private readonly RoleCheckRepository _roleCheckRepository;
 
-        public UserService(UserRepository repository)
+        public UserService(UserRepository repository,
+            RoleCheckRepository roleCheckRepository)
         {
             _userRepository = repository;
+            _roleCheckRepository = roleCheckRepository;
         }
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()
@@ -33,9 +37,35 @@ namespace Social_Media.BAL
         {
             await _userRepository.DeleteUser(id);
         }
+
+        //Render userID
+        private string GenerateUserID()
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            return new string(Enumerable.Repeat(chars, 20)
+              .Select(s => s[new Random().Next(s.Length)]).ToArray());
+        }
+
         public async Task RegisterAccountAsync(RegisterDTO registerDTO)
         {
-            await _userRepository.RegisterAccount(registerDTO);
+            var user = new User
+            {
+                Id = GenerateUserID(),
+                Email = registerDTO.Email,
+                Password = registerDTO.Password,
+                PhoneNumber = registerDTO.PhoneNumber,
+                Fullname = registerDTO.FullName,
+                Birth = registerDTO.Birth,
+                gender = null,
+                Avatar = "user/avatar/avatar_user.png"
+            };
+            await _userRepository.RegisterAccount(user);
+            var roleUser = new RoleCheck
+            {
+                UserID = user.Id,
+                RoleID = "1",
+            };
+            await _roleCheckRepository.AddRoleCheck(roleUser);
         }
 
         public async Task<List<User>> FindUserAsync(string stringData)
@@ -45,7 +75,16 @@ namespace Social_Media.BAL
 
         public async Task UpdatePersonalInformation (PersonalInformationDTO personalInformationDTO)
         {
-            await _userRepository.UpdatePersonalInformation(personalInformationDTO);
+            var user = await _userRepository.GetUserById(personalInformationDTO.userID);
+            if (user == null) return;
+
+            user.Fullname = personalInformationDTO.fullname ?? user.Fullname;
+            user.Birth = personalInformationDTO.Birth ?? user.Birth;
+            user.Avatar = personalInformationDTO.avatar ?? user.Avatar;
+            user.gender = personalInformationDTO.gender ?? user.gender;
+            user.addressID = personalInformationDTO.addressID ?? user.addressID;
+
+            await _userRepository.UpdateUser(user);
         }
     }
 }

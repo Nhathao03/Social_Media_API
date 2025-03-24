@@ -39,7 +39,7 @@ namespace Social_Media.Controllers
             };
             await _postService.AddPostAsync(post);
 
-            if(postDto.PostImages != null)
+            if(postDto.PostImages[0] != null)
             {
                 for (var i = 0; i < postDto.PostImages.Count; i++)
                 {
@@ -91,6 +91,14 @@ namespace Social_Media.Controllers
             var posts = await _postService.GetPostsByUserIDAsync(userID);
             if (posts == null) return NotFound();
             return Ok(posts);
+        }
+
+        [HttpGet("GetAllPostNearestCreatedAt")]
+        public async Task<IActionResult> GetAllPostNearestCreatedAt()
+        {
+            var result = await _postService.GetAllPostNearestCreatedAtAsync();
+            if (result == null) return NotFound();
+            return Ok(result);
         }
 
     }

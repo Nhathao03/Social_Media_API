@@ -34,7 +34,8 @@ namespace Social_Media.Models
         public string? Avatar { get; set; }
         public List<Follower> follower { get; set; }
         public List<Following> following { get; set; }
-        public string gender { get; set; }
+        public string? gender { get; set; }
+        public int? addressID { get; set; }
         public Address? address { get; set; }
     }
 }

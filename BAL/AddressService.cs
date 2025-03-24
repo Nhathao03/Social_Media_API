@@ -32,8 +32,15 @@ namespace Social_Media.BAL
         {
             await _repository.DeleteAddress(id);
         }
-        public async Task AddAddressAsync(AddressDTO address)
+        public async Task AddAddressAsync(AddressDTO addressDTO)
         {
+            var address = new Address
+            {
+                name = addressDTO.name,
+                slug = addressDTO.slug,
+                type = addressDTO.type,
+                name_with_type = addressDTO.name_with_type,
+            };
             await _repository.AddNewAddress(address);
         }
     }

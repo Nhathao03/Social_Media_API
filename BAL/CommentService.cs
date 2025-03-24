@@ -23,8 +23,19 @@ namespace Social_Media.BAL
             return await _commentRepository.GetCommentById(id);
         }
 
-        public async Task AddCommentAsync(CommentDTO comment)
+        public async Task AddCommentAsync(CommentDTO commentDTO)
         {
+            var comment = new Comment
+            {
+                UserId = commentDTO.userID,
+                PostId = commentDTO.postID,
+                Sticker = commentDTO.sticker,
+                Content = commentDTO.Content,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                Image = commentDTO.ImageUrl,
+            };
+
             await _commentRepository.AddComment(comment);
         }
 

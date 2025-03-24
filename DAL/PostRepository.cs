@@ -3,7 +3,7 @@ using Social_Media.Models;
 
 namespace Social_Media.DAL
 {
-    public class PostRepository :IPostRepository
+    public class PostRepository : IPostRepository
     {
         private readonly AppDbContext _context;
 
@@ -17,6 +17,15 @@ namespace Social_Media.DAL
             return await _context.posts.Include(p => p.Comments).Include(p => p.Likes).Include(p => p.PostCategory).Include(p => p.PostImages).ToListAsync();
         }
 
+        public async Task<IEnumerable<Post>> GetAllPostNearestCreatedAt()
+        {
+            return await _context.posts.Where(p => p.CreatedAt <= DateTime.UtcNow)
+                                 .Include(p => p.Comments)
+                                 .Include(p => p.Likes)
+                                 .Include(p => p.PostCategory)
+                                 .Include(p => p.PostImages)
+                                 .OrderByDescending(p => p.CreatedAt).ToListAsync();
+        }
         public async Task<Post> GetPostById(int id)
         {
             return await _context.posts.Include(p => p.Comments).Include(p => p.Likes).Include(p => p.PostCategory).Include(p => p.PostImages).FirstOrDefaultAsync(p => p.ID == id);
@@ -47,7 +56,7 @@ namespace Social_Media.DAL
         //Get posts by userID
         public async Task<IEnumerable<Post>> GetPostsByUserID(string userID)
         {
-           return await _context.posts.Include(p => p.Comments).Include(p => p.Likes).Include(p => p.PostCategory).Include(p => p.PostImages).Where(p => p.UserID == userID).ToListAsync();
+            return await _context.posts.Include(p => p.Comments).Include(p => p.Likes).Include(p => p.PostCategory).Include(p => p.PostImages).Where(p => p.UserID == userID).ToListAsync();
         }
 
     }

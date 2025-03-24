@@ -7,7 +7,5 @@
         public string Password { get; set; }
         public DateTime Birth { get; set; }
         public string PhoneNumber { get; set; }
-        public string gender { get; set; }
-
     }
 }

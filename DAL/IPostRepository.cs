@@ -10,5 +10,6 @@ namespace Social_Media.DAL
         Task UpdatePost(Post post);
         Task DeletePost(int id);
         Task<IEnumerable<Post>> GetPostsByUserID(string userID);
+        Task<IEnumerable<Post>> GetAllPostNearestCreatedAt();
     }
 }

@@ -7,7 +7,7 @@ namespace Social_Media.DAL
     {
         Task<IEnumerable<Like>> GetAllLikes();
         Task<Like> GetLikeById(int id);
-        Task AddLike(LikeDTO like);
+        Task AddLike(Like like);
         Task UpdateLike(Like like);
         Task DeleteLike(int id);
         Task<Like?> GetLikeByUserAndPost(string userId, int postId);

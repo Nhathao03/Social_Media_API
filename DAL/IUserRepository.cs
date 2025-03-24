@@ -10,8 +10,7 @@ namespace Social_Media.DAL
         Task<User> GetUserById(string id);
         Task UpdateUser(User user);
         Task DeleteUser(string id);
-        Task RegisterAccount(RegisterDTO registerDTO);
+        Task RegisterAccount(User user);
         Task<List<User>> FindUser(string stringData);
-        Task UpdatePersonalInformation (PersonalInformationDTO personalInformationDTO);
     }
 }
