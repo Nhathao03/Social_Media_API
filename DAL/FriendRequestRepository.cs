@@ -26,18 +26,12 @@ namespace Social_Media.DAL
 
         public async Task<List<FriendRequest>> GetFriendRequestBySenderID(string id)
         {
-            return await _context.friendRequests.Where(f => f.SenderID == id).ToListAsync();
+            return await _context.friendRequests.Where(f => f.SenderID == id && f.status == 1).ToListAsync();
         }
 
-        public async Task AddFriendRequest(FriendRequestDTO friendRequestDTO)
+        public async Task AddFriendRequest(FriendRequest friendRequest)
         {
-            var request = new FriendRequest
-            {
-                SenderID = friendRequestDTO.SenderID,
-                ReceiverID = friendRequestDTO.ReceiverID,
-                status = (int)Constants.FriendRequestEnum.Pending,
-            };
-            _context.friendRequests.Add(request);
+            _context.friendRequests.Add(friendRequest);
             await _context.SaveChangesAsync();
         }
 
@@ -56,18 +50,5 @@ namespace Social_Media.DAL
                 await _context.SaveChangesAsync();
             }
         }
-
-        //REVISE THIS CODE
-        public async Task ConfirmRequest(int id)
-        {
-            var request = await _context.friendRequests.FindAsync(id);
-            if (request == null)
-            {
-                throw new KeyNotFoundException($"Friend request with ID {id} not found.");
-            }
-            request.status = (int)Constants.FriendRequestEnum.Accepted;
-            await _context.SaveChangesAsync();
-        }
-
     }
 }

@@ -9,6 +9,6 @@ namespace Social_Media.DAL
         Task<Address> GetAddressById(int id);
         Task UpdateAddress(Address Address);
         Task DeleteAddress(int id);
-        Task AddNewAddress (AddressDTO addressDTO);
+        Task AddNewAddress (Address address);
     }
 }

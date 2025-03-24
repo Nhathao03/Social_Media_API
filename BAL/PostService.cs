@@ -42,5 +42,10 @@ namespace Social_Media.BAL
         {
            return await _repository.GetPostsByUserID(userID);
         }
+
+        public async Task<IEnumerable<Post>> GetAllPostNearestCreatedAtAsync()
+        {
+            return await _repository.GetAllPostNearestCreatedAt();
+        }
     }
 }

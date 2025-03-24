@@ -43,6 +43,5 @@ namespace Social_Media.DAL
                 await _context.SaveChangesAsync();
             }
         }
-
     }
 }

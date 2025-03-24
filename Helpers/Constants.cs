@@ -10,10 +10,17 @@ namespace Social_Media.Helpers
             Pending = 1,
             [Description("Accepted")]
             Accepted = 2,
-            [Description("Rejected")]
-            Rejected = 3,
-            [Description("Cancelled")]
-            Cancelled = 4
+        }
+
+        public enum FriendsEnum
+        {
+            [Description("Close friends")]
+            Close_Friends = 1,
+            [Description("Home Town")]
+            Home_Town = 2,
+            [Description("normal")]
+            normal = 5,
+
         }
     }
 }

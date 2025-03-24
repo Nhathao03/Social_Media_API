@@ -23,9 +23,16 @@ namespace Social_Media.BAL
             return await _likeRepository.GetLikeById(id);
         }
 
-        public async Task AddLikeAsync(LikeDTO like)
+        public async Task AddLikeAsync(LikeDTO likeDTO)
         {
-            await _likeRepository.AddLike(like);
+            var likeData = new Like
+            {
+                UserId = likeDTO.UserID,
+                PostId = likeDTO.postID,
+                CreatedAt = DateTime.UtcNow,
+            };
+
+            await _likeRepository.AddLike(likeData);
         }
 
         public async Task UpdateLikeAsync(Like like)

@@ -6,10 +6,8 @@ using Social_Media.Models.DTO;
 
 namespace Social_Media.Controllers
 {
-
     [Route("api/address")]
     [ApiController]
-
     public class AddressController : ControllerBase
     {
         private readonly IAddressService _addressService;
@@ -17,7 +15,7 @@ namespace Social_Media.Controllers
         {
             _addressService = addressService;
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost("addAddress")]
         public async Task<IActionResult> addAddress([FromBody] AddressDTO addressDTO)
         {

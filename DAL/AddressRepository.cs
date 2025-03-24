@@ -39,16 +39,8 @@ namespace Social_Media.DAL
             }
         }
 
-        public async Task AddNewAddress(AddressDTO addressDTO)
+        public async Task AddNewAddress(Address address)
         {
-            var address = new Address
-            {
-                name = addressDTO.name,
-                slug = addressDTO.slug,
-                type = addressDTO.type,
-                name_with_type = addressDTO.name_with_type,
-            };
-
             _context.AddAsync(address);
             await _context.SaveChangesAsync();
         }

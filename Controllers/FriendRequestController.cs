@@ -19,6 +19,12 @@ namespace Social_Media.Controllers
         public async Task<IActionResult> addFriendRequest ([FromBody] FriendRequestDTO friendRequestDTO)
         {
             if (friendRequestDTO == null) return BadRequest();
+            var result = await _friendRequestService.GetAllFriendRequestAsync();
+            bool existingFriend = result.Any(s => s.SenderID == friendRequestDTO.SenderID && s.ReceiverID == friendRequestDTO.ReceiverID);
+            if (existingFriend)
+            {
+               
+            }
             await _friendRequestService.AddFriendRequestAsync(friendRequestDTO);
             return Ok("Successed !");
         }
@@ -60,8 +66,15 @@ namespace Social_Media.Controllers
         {
             if(id == null || id == 0) return BadRequest();
             await _friendRequestService.ConfirmRequest(id);
-            return Ok("Accected success !");
+            return Ok("Accected friend success !");
+        }
+
+        [HttpDelete("rejectFriendRequest/{id}")]
+        public async Task<IActionResult> rejectFriendRequest(int id)
+        {
+            if (id == null || id == 0) return BadRequest();
+            await _friendRequestService.DeleteFriendRequestAsync(id);
+            return Ok("Reject friend request success !");
         }
     }
-
 }

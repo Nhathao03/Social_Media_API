@@ -40,34 +40,10 @@ namespace Social_Media.DAL
             }
         }
 
-        //Render userID
-        private string GenerateUserID()
-        {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            return new string(Enumerable.Repeat(chars, 20)
-              .Select(s => s[new Random().Next(s.Length)]).ToArray());
-        }
-
         //Register account
-        public async Task RegisterAccount(RegisterDTO model)
+        public async Task RegisterAccount(User user)
         {
-            var user = new User
-            {
-                Id = GenerateUserID(),
-                Email = model.Email,
-                Password = model.Password, 
-                PhoneNumber = model.PhoneNumber,
-                Fullname = model.FullName,
-                Birth = model.Birth,
-                gender = model.gender,
-            };
-            var roleUser = new RoleCheck
-            {
-                UserID = user.Id,
-                RoleID = "1",
-            };
             _context.AddAsync(user);
-            _context.AddAsync(roleUser);
             await _context.SaveChangesAsync();
         }
 
@@ -94,19 +70,5 @@ namespace Social_Media.DAL
                 .ToListAsync();
         }
 
-        //Update personal information
-        public async Task UpdatePersonalInformation (PersonalInformationDTO personalInformationDTO)
-        {
-            if (personalInformationDTO == null) return;
-            var user = await _context.users.FindAsync(personalInformationDTO.userID);
-            if (user == null)
-            {
-                throw new KeyNotFoundException($"User with ID {personalInformationDTO.userID} not found.");
-            }
-            user.Fullname = personalInformationDTO.fullname;
-            user.Birth = personalInformationDTO.Birth;
-            user.Avatar = personalInformationDTO.avatar;
-            
-        }
     }
 }

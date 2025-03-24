@@ -6,9 +6,9 @@ using Social_Media.Models;
 
 namespace Social_Media.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [Route("api/category")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
     public class CategoryController : ControllerBase
     {
         private readonly IPostCategoryService _category;
@@ -18,14 +18,14 @@ namespace Social_Media.Controllers
             _category = category;
         }
 
-        [HttpGet]
+        [HttpGet("getAllCategory")]
         public async Task<IActionResult> Get()
         {
             var postcategory = await _category.GetAllPostCategory();
             return Ok(postcategory);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("getCategoryByID/{id}")]
         public async Task<IActionResult> Get(int id)
         {
             var postcategory = await _category.GetPostCategoryById(id);
@@ -33,7 +33,8 @@ namespace Social_Media.Controllers
             return Ok(postcategory);
         }
 
-        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [HttpPost("addNewCategory")]
         public async Task<IActionResult> Post([FromBody] PostCategory postcategory)
         {
             if (postcategory == null) return BadRequest();
