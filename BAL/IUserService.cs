@@ -13,5 +13,7 @@ namespace Social_Media.BAL
         Task RegisterAccountAsync (RegisterDTO registerDTO);
         Task<List<User>> FindUserAsync(string stringData);
         Task UpdatePersonalInformation (PersonalInformationDTO personalInformationDTO);
+        Task ChangePassword(ChangePasswordDTO changePasswordDTO);
+        Task ManageContact(ManageContactDTO manageContactDTO);
     }
 }

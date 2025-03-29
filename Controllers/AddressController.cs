@@ -25,6 +25,7 @@ namespace Social_Media.Controllers
         }
 
         [HttpGet("getAllAddress")]
+        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false)]
         public async Task<IActionResult> getAllAddress()
         {
             var address = await _addressService.GetAllAddressAsync();

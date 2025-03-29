@@ -11,5 +11,6 @@ namespace Social_Media.DAL
         Task UpdateFriend(Friends friends);
         Task DeleteFriend(int id);
         Task<List<Friends>> GetFriendsByUserID(string userId);
+        Task<List<Friends>> getFriendRecentlyAdded(string userId);
     }
 }

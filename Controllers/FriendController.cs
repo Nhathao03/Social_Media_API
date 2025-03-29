@@ -30,5 +30,13 @@ namespace Social_Media.Controllers
             if (response == null) return NotFound();
             return Ok(response);
         }
+
+        [HttpGet("getFriendRecentlyAdded")]
+        public async Task<IActionResult> getFriendRecentlyAdded(string userID)
+        {
+            var response = await _friendsService.getFriendRecentlyAdded(userID); 
+            if (response == null) return NotFound();
+            return Ok(response);
+        }
     }
 }

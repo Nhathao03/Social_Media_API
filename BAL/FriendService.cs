@@ -51,9 +51,14 @@ namespace Social_Media.BAL
             await _FriendRepository.DeleteFriend(id);
         }
 
-        public async Task<List<Friends>> GetFriendsByUserIDAsync(string  userID)
+        public async Task<List<Friends>> GetFriendsByUserIDAsync(string userID)
         {
             return await _FriendRepository.GetFriendsByUserID(userID);
+        }
+
+        public async Task<List<Friends>> getFriendRecentlyAdded(string userID)
+        {
+           return await _FriendRepository.getFriendRecentlyAdded(userID);
         }
     }
 }

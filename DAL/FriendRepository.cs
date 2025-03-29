@@ -49,5 +49,14 @@ namespace Social_Media.DAL
         {
             return await _context.friends.Where(f => f.UserID == userID).ToListAsync();
         }
+
+        public async Task<List<Friends>> getFriendRecentlyAdded(string userID)
+        {
+            var fiveDaysAgo = DateTime.UtcNow.AddDays(-3);
+            return await _context.friends
+                .Where(f => f.UserID == userID && f.CreatedDate >= fiveDaysAgo)
+                .OrderBy(m => m.CreatedDate)
+                .ToListAsync();
+        }
     }
 }

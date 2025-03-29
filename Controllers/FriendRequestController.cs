@@ -21,9 +21,10 @@ namespace Social_Media.Controllers
             if (friendRequestDTO == null) return BadRequest();
             var result = await _friendRequestService.GetAllFriendRequestAsync();
             bool existingFriend = result.Any(s => s.SenderID == friendRequestDTO.SenderID && s.ReceiverID == friendRequestDTO.ReceiverID);
+            //result.Select(i => i.ID).Where(f => f.)
             if (existingFriend)
             {
-               
+               //await _friendRequestService.DeleteFriendRequestAsync()
             }
             await _friendRequestService.AddFriendRequestAsync(friendRequestDTO);
             return Ok("Successed !");
@@ -53,6 +54,7 @@ namespace Social_Media.Controllers
         }
 
         [HttpGet("getFriendRequestsBySenderID/{id}")]
+        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false)]
         public async Task<IActionResult> getFriendRequestsBySenderID(string id)
         {
             if(id == null) return BadRequest();

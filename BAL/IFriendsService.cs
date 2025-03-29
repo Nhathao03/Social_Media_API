@@ -11,5 +11,6 @@ namespace Social_Media.BAL
         Task UpdateFriendsAsync(Friends Friends);
         Task DeleteFriendsAsync(int id);
         Task<List<Friends>> GetFriendsByUserIDAsync(string userID);
+        Task<List<Friends>> getFriendRecentlyAdded(string  userID);
     }
 }
