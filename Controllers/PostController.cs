@@ -55,6 +55,7 @@ namespace Social_Media.Controllers
         }
 
         [HttpGet("getAllPost")]
+        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false)]
         public async Task<IActionResult> GetAllPost()
         {
             var posts = await _postService.GetAllPostsAsync();
@@ -86,6 +87,7 @@ namespace Social_Media.Controllers
         }
 
         [HttpGet("getPostsByUserID/{userID}")]
+        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false)]
         public async Task<IActionResult> GetPostsByuserID(string userID)
         {
             var posts = await _postService.GetPostsByUserIDAsync(userID);
@@ -94,6 +96,7 @@ namespace Social_Media.Controllers
         }
 
         [HttpGet("GetAllPostNearestCreatedAt")]
+        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false)]
         public async Task<IActionResult> GetAllPostNearestCreatedAt()
         {
             var result = await _postService.GetAllPostNearestCreatedAtAsync();

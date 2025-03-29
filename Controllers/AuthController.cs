@@ -130,12 +130,34 @@ namespace Social_Media.Controllers
             return Ok(user);
         }
 
-        [HttpPatch("UpdatePersonalInformation")]
+        [HttpPut("UpdatePersonalInformation")]
         public async Task<IActionResult> UpdatePersonalInformation([FromBody] PersonalInformationDTO personalInformationDTO)
         {
             if (personalInformationDTO == null) return BadRequest();
             await _userService.UpdatePersonalInformation(personalInformationDTO);
             return Ok("Success update user.");
+        }
+
+        [HttpPut("ChangePassword")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO changePasswordDTO)
+        {
+            if (changePasswordDTO == null) return BadRequest();
+            if(changePasswordDTO.newPassword != changePasswordDTO.verifyPaddword)
+            {
+                return BadRequest("Verify Password incorrect");
+            }
+            else
+            {
+                await _userService.ChangePassword(changePasswordDTO);
+                return Ok("Success update password user");
+            }
+        }
+        [HttpPut("ManageContact")]
+        public async Task<IActionResult> ManageContact([FromBody] ManageContactDTO manageContactDTO)
+        {
+            if(manageContactDTO == null ) return BadRequest();
+            await _userService.ManageContact(manageContactDTO);
+            return Ok("Update manage contact success");
         }
     }
 }

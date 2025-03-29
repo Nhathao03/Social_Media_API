@@ -49,6 +49,7 @@ namespace Social_Media
             builder.Services.AddScoped<TypeFriendsRepository>();
             builder.Services.AddScoped<FriendRequestRepository>();
             builder.Services.AddScoped<FriendRepository>();
+            builder.Services.AddScoped<MessageRepository>();
             builder.Services.AddScoped<IPostService, PostService>();
             builder.Services.AddScoped<IPostCategoryService, PostCategoryService>();
             builder.Services.AddScoped<IUserService, UserService>();
@@ -61,17 +62,20 @@ namespace Social_Media
             builder.Services.AddScoped<ITypeFriendsService, TypeFriendsService>();
             builder.Services.AddScoped<IFriendRequestService, FriendRequestService>();
             builder.Services.AddScoped<IFriendsService, FriendService>();
+            builder.Services.AddScoped<IMessageService, MessageService>();
 
             builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
             // Add services to the container.
 
             builder.Services.AddControllers();
+            builder.Services.AddResponseCaching(); //Response Caching
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
             options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
+            builder.Services.AddSignalR();
             //CORS (Cross-Origin Resource Sharing) allow access API from other domain 
             builder.Services.AddCors(options =>
             {
@@ -96,6 +100,7 @@ namespace Social_Media
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            app.UseResponseCaching();
             app.UseAuthentication();
             app.UseAuthorization();
 

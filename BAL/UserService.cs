@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 using Social_Media.DAL;
 using Social_Media.Models;
 using Social_Media.Models.DTO;
@@ -73,6 +77,7 @@ namespace Social_Media.BAL
             return await _userRepository.FindUser(stringData);
         }
 
+        //Update information user
         public async Task UpdatePersonalInformation (PersonalInformationDTO personalInformationDTO)
         {
             var user = await _userRepository.GetUserById(personalInformationDTO.userID);
@@ -86,5 +91,24 @@ namespace Social_Media.BAL
 
             await _userRepository.UpdateUser(user);
         }
+
+        //Change Password
+        public async Task ChangePassword(ChangePasswordDTO changePasswordDTO)
+        {
+            var result = await _userRepository.GetUserById(changePasswordDTO.userID);
+            if (result == null) return;
+            if (changePasswordDTO.currentPassword != result.Password) return;
+            result.Password = changePasswordDTO.newPassword;
+            await _userRepository.UpdateUser(result);
+        }
+
+        public async Task ManageContact (ManageContactDTO manageContactDTO)
+        {
+            var result = await _userRepository.GetUserById(manageContactDTO.userID);
+            if(result == null) return;
+            result.PhoneNumber = manageContactDTO.phoneNumber;
+            await _userRepository.UpdateUser(result);
+        }
+        
     }
 }
