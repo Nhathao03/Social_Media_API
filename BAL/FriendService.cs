@@ -60,5 +60,15 @@ namespace Social_Media.BAL
         {
            return await _FriendRepository.getFriendRecentlyAdded(userID);
         }
+
+        public async Task<List<Friends>> getFriendOfEachUser(string userId)
+        {
+            return await _FriendRepository.GetFriendOfEachUser(userId);
+        }
+
+        public async Task<List<Friends>> GetFriendBaseOnHomeTown(string userId)
+        {
+            return await _FriendRepository.GetFriendBaseOnHomeTown(userId);
+        }
     }
 }

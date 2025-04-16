@@ -21,12 +21,23 @@ namespace Social_Media.Controllers
             if (friendRequestDTO == null) return BadRequest();
             var result = await _friendRequestService.GetAllFriendRequestAsync();
             bool existingFriend = result.Any(s => s.SenderID == friendRequestDTO.SenderID && s.ReceiverID == friendRequestDTO.ReceiverID);
-            //result.Select(i => i.ID).Where(f => f.)
+            var listRequest = result.ToList();
+            int idRequest = 0;
             if (existingFriend)
             {
-               //await _friendRequestService.DeleteFriendRequestAsync()
+                for(int i = 0; i < listRequest.Count; i++)
+                {
+                    if (listRequest[i].SenderID == friendRequestDTO.SenderID && listRequest[i].ReceiverID == friendRequestDTO.ReceiverID)
+                    {
+                        idRequest = listRequest[i].ID;
+                    }
+                }
+                await _friendRequestService.DeleteFriendRequestAsync(idRequest);
             }
-            await _friendRequestService.AddFriendRequestAsync(friendRequestDTO);
+            else
+            {
+                await _friendRequestService.AddFriendRequestAsync(friendRequestDTO);
+            }      
             return Ok("Successed !");
         }
 
@@ -53,12 +64,12 @@ namespace Social_Media.Controllers
             return NoContent();
         }
 
-        [HttpGet("getFriendRequestsBySenderID/{id}")]
+        [HttpGet("getFriendRequestByReceiverID/{id}")]
         [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false)]
         public async Task<IActionResult> getFriendRequestsBySenderID(string id)
         {
             if(id == null) return BadRequest();
-            var result = await _friendRequestService.GetFriendRequestBySenderID(id);
+            var result = await _friendRequestService.GetFriendRequestByReceiverID(id);
             if(result == null) return NotFound();
             return Ok(result);
         }
@@ -77,6 +88,15 @@ namespace Social_Media.Controllers
             if (id == null || id == 0) return BadRequest();
             await _friendRequestService.DeleteFriendRequestAsync(id);
             return Ok("Reject friend request success !");
+        }
+
+        [HttpGet("getFriendRequestByUserID/{id}")]
+        public async Task<IActionResult> getFriendRequestByUserID(string id)
+        {
+            if (id == null) return BadRequest();
+            var result = await _friendRequestService.GetFriendRequestByUserID(id);
+            if (result == null) return NotFound();
+            return Ok(result);
         }
     }
 }
