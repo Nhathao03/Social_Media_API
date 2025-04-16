@@ -45,9 +45,14 @@ namespace Social_Media.BAL
         {
             await _FriendRequestRepository.DeleteFriendRequest(id);
         }
-        public async Task<List<FriendRequest>> GetFriendRequestBySenderID(string id)
+        public async Task<List<FriendRequest>> GetFriendRequestByReceiverID(string id)
         {
-            return await _FriendRequestRepository.GetFriendRequestBySenderID(id);
+            return await _FriendRequestRepository.GetFriendRequestByReceiverID(id);
+        }
+
+        public async Task<List<FriendRequest>> GetFriendRequestByUserID(string id)
+        {
+            return await _FriendRequestRepository.GetFriendRequestByUserID(id);
         }
 
         //REVISE THIS CODE

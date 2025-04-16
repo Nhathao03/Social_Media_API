@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Social_Media.BAL;
 using Social_Media.Models;
 using Social_Media.Models.DTO;
@@ -100,6 +101,42 @@ namespace Social_Media.Controllers
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        [HttpPost("decode")]
+        public IActionResult Decode([FromBody] string jwtToken)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(jwtToken))
+                    return BadRequest("Token is required.");
+
+                var handler = new JwtSecurityTokenHandler();
+
+                if (!handler.CanReadToken(jwtToken))
+                    return BadRequest("Invalid JWT format.");
+
+                var token = handler.ReadJwtToken(jwtToken);
+
+                // Transform claims dictionary
+                var payload = token.Payload
+                    .ToDictionary(kvp =>
+                        kvp.Key == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name" ? "userID" : kvp.Key,
+                        kvp => kvp.Value
+                    );
+
+                var result = new
+                {
+                    Header = token.Header,
+                    Payload = payload
+                };
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         [HttpGet("GetAllUser")]

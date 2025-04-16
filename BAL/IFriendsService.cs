@@ -12,5 +12,7 @@ namespace Social_Media.BAL
         Task DeleteFriendsAsync(int id);
         Task<List<Friends>> GetFriendsByUserIDAsync(string userID);
         Task<List<Friends>> getFriendRecentlyAdded(string  userID);
+        Task<List<Friends>> getFriendOfEachUser(string userId);
+        Task<List<Friends>> GetFriendBaseOnHomeTown(string userId);
     }
 }

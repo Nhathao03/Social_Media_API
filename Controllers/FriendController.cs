@@ -31,10 +31,25 @@ namespace Social_Media.Controllers
             return Ok(response);
         }
 
-        [HttpGet("getFriendRecentlyAdded")]
+        [HttpGet("getFriendRecentlyAdded/{userId}")]
         public async Task<IActionResult> getFriendRecentlyAdded(string userID)
         {
             var response = await _friendsService.getFriendRecentlyAdded(userID); 
+            if (response == null) return NotFound();
+            return Ok(response);
+        }
+
+        [HttpGet("getFriendOfEachUser/{userId}")]
+        public async Task<IActionResult> getFriendOfEachUser(string userId)
+        {
+            var response = await _friendsService.getFriendOfEachUser(userId);
+            if (response == null) return NotFound();
+            return Ok(response);
+        }
+        [HttpGet("GetFriendBaseOnHomeTown/{userId}")]
+        public async Task<IActionResult> GetFriendBaseOnHomeTown(string userId)
+        {
+            var response = await _friendsService.GetFriendBaseOnHomeTown(userId);
             if (response == null) return NotFound();
             return Ok(response);
         }
