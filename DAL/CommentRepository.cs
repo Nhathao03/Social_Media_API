@@ -23,6 +23,10 @@ namespace Social_Media.DAL
         {
             return await _context.comments.FirstOrDefaultAsync(p => p.ID == id);
         }
+        public async Task<IEnumerable<Comment>> GetCommentByPostID(int postID)
+        {
+            return await _context.comments.Where(c => c.PostId == postID).ToListAsync();
+        }
 
         public async Task AddComment(Comment comment)
         {
@@ -46,5 +50,6 @@ namespace Social_Media.DAL
             }
         }
 
+        
     }
 }

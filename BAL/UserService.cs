@@ -97,8 +97,8 @@ namespace Social_Media.BAL
         {
             var result = await _userRepository.GetUserById(changePasswordDTO.userID);
             if (result == null) return;
-            if (changePasswordDTO.currentPassword != result.Password) return;
-            result.Password = changePasswordDTO.newPassword;
+            if (changePasswordDTO.currentPass != result.Password) return;
+            result.Password = changePasswordDTO.newPass;
             await _userRepository.UpdateUser(result);
         }
 
@@ -110,5 +110,15 @@ namespace Social_Media.BAL
             await _userRepository.UpdateUser(result);
         }
         
+        public async Task UploadBackgroundUser(BackgroundDTO backgroundDTO)
+        {
+            var user = await _userRepository.GetUserById(backgroundDTO.userId);
+            if (user == null ) return;
+            if (backgroundDTO != null)
+            {
+                user.BackgroundProfile = backgroundDTO.backgroundImage;
+                await _userRepository.UpdateUser(user);
+            }
+        }
     }
 }

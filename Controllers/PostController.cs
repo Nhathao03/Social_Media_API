@@ -23,10 +23,11 @@ namespace Social_Media.Controllers
             
         }
 
+        // Create a new post
         [HttpPost("CreatePost")]
         public async Task<IActionResult> CreatePost([FromBody] PostDTO postDto)
         {
-            if (postDto == null) return BadRequest();
+            if (postDto == null || postDto.UserID == null) return BadRequest();
             var post = new Post
             {
                 UserID = postDto.UserID,
@@ -71,7 +72,7 @@ namespace Social_Media.Controllers
             return Ok(post);
         }    
 
-        [HttpPut("{id}")]
+        [HttpPut("updatePost/{id}")]
         public async Task<IActionResult> UpdatePost(int id, [FromBody] Post post)
         {
             if (post == null || post.ID != id) return BadRequest();

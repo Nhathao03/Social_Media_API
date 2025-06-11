@@ -19,6 +19,7 @@ namespace Social_Media.Controllers
             _commentService = commentService;
         }
 
+        //Add new comment on post
         [HttpPost("CreateNewComment")]
         public async Task<IActionResult> CreateNewComment([FromBody] CommentDTO commentDTO)
         {
@@ -27,6 +28,7 @@ namespace Social_Media.Controllers
             return Ok("Create new comment success !");
         }
 
+        //Get all comments
         [HttpGet("GetAllComment")]
         public async Task<IActionResult> getAllComment()
         {
@@ -35,6 +37,7 @@ namespace Social_Media.Controllers
             return Ok(comments);
         }
 
+        //Get comment by ID
         [HttpGet("getCommentByID/{id}")]
         public async Task<IActionResult> getCommentByID(int id)
         {
@@ -43,6 +46,8 @@ namespace Social_Media.Controllers
             return Ok(comment);
         }
 
+
+        //Delete comment by ID
         [HttpDelete("deleteCommentByID/{id}")]
         public async Task<IActionResult> deleteCommentByID (int id)
         {
@@ -50,6 +55,7 @@ namespace Social_Media.Controllers
             return NoContent();
         }
 
+        //Add like to comment by ID
         [HttpPut("AddLikeComment/{id}")]
         public async Task<IActionResult> AddLikeComment(int id)
         {
@@ -61,6 +67,24 @@ namespace Social_Media.Controllers
             await _commentService.UpdateCommentAsync(commentData);
 
             return NoContent();
+        }
+
+        //Add comment by post ID
+        [HttpGet("getCommentByPostID/{postID}")]
+        public async Task<IActionResult> getCommentByPostID(int postID)
+        {
+            var comment = await _commentService.GetCommentByPostIDAsync(postID);
+            if (comment == null) return NotFound();
+            return Ok(comment);
+        }
+
+        //Update comment by ID
+        [HttpPut("updateComment")]
+        public async Task<IActionResult> updateComment([FromBody] Comment comment)
+        {
+            if (comment == null) return BadRequest();
+            await _commentService.UpdateCommentAsync(comment);
+            return Ok("Update comment success");
         }
 
     }

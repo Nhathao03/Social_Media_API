@@ -10,5 +10,6 @@ namespace Social_Media.DAL
         Task UpdatePostImage(PostImage post);
         Task DeletePostImage(int id);
         Task<List<PostImage>> GetAllPostImagesByUserID(string userId);
+        Task<List<PostImage>> GetPostImagesByPostID(int postId);
     }
 }

@@ -12,7 +12,7 @@ namespace Social_Media.DAL
         Task DeleteFriend(int id);
         Task<List<Friends>> GetFriendsByUserID(string userId);
         Task<List<Friends>> getFriendRecentlyAdded(string userId);
-        Task<List<Friends>> GetFriendOfEachUser(string userId);
+        Task<List<string>> GetFriendOfEachUser(string userId);
         Task<List<Friends>> GetFriendBaseOnHomeTown(string userId);    
     }
 }

@@ -25,7 +25,7 @@ namespace Social_Media.Controllers
             _config = configuration;
         }
 
-        //Register acccount
+        //Register account
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAccount([FromBody] RegisterDTO model)
         {
@@ -80,7 +80,7 @@ namespace Social_Media.Controllers
             }  
         }
 
-        //Generate token
+        //Generate JWT Token
         private string GenerateJwtToken(string userID)
         {
             var jwtSettings = _config.GetSection("Jwt");
@@ -103,6 +103,28 @@ namespace Social_Media.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        //Refresh JWT Token
+        [HttpPost("refreshToken")]
+        public IActionResult RefreshToken([FromBody] string token)
+        {
+            if (string.IsNullOrEmpty(token))
+                return BadRequest("Token is required.");
+
+            var handler = new JwtSecurityTokenHandler();
+            if (!handler.CanReadToken(token))
+                return BadRequest("Invalid token format.");
+
+            var jwtToken = handler.ReadJwtToken(token);
+            var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User not authenticated.");
+
+            var newToken = GenerateJwtToken(userId);
+            return Ok(new { token = newToken });
+        }
+
+        //Decode JWT Token
         [HttpPost("decode")]
         public IActionResult Decode([FromBody] string jwtToken)
         {
@@ -139,6 +161,7 @@ namespace Social_Media.Controllers
             }
         }
 
+        //Get all users
         [HttpGet("GetAllUser")]
         public async Task<IActionResult> GetAllUser()
         {
@@ -146,6 +169,7 @@ namespace Social_Media.Controllers
             return Ok(getAllUser);
         }
 
+        //Get user by ID
         [HttpGet("GetUserById")]
         public async Task<IActionResult> GetUserById(string userID)
         {
@@ -153,12 +177,14 @@ namespace Social_Media.Controllers
             return Ok(getUser);
         }
 
+        //Logout user
         [HttpPost("logout")]
         public IActionResult Logout()
         {
             return Ok(new { message = "Logout successful" });
         }
 
+        //Find user by string data (email or phone number)
         [HttpGet("findUser/{stringData}")]
         public async Task<IActionResult> FindUser(string stringData)
         {
@@ -167,6 +193,7 @@ namespace Social_Media.Controllers
             return Ok(user);
         }
 
+        //Update personal information user
         [HttpPut("UpdatePersonalInformation")]
         public async Task<IActionResult> UpdatePersonalInformation([FromBody] PersonalInformationDTO personalInformationDTO)
         {
@@ -175,11 +202,12 @@ namespace Social_Media.Controllers
             return Ok("Success update user.");
         }
 
+        //Change user password
         [HttpPut("ChangePassword")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO changePasswordDTO)
         {
             if (changePasswordDTO == null) return BadRequest();
-            if(changePasswordDTO.newPassword != changePasswordDTO.verifyPaddword)
+            if(changePasswordDTO.newPass != changePasswordDTO.verifyPass)
             {
                 return BadRequest("Verify Password incorrect");
             }
@@ -189,12 +217,38 @@ namespace Social_Media.Controllers
                 return Ok("Success update password user");
             }
         }
+
+        //Change manage contact user
         [HttpPut("ManageContact")]
         public async Task<IActionResult> ManageContact([FromBody] ManageContactDTO manageContactDTO)
-        {
+         {
             if(manageContactDTO == null ) return BadRequest();
             await _userService.ManageContact(manageContactDTO);
             return Ok("Update manage contact success");
         }
+
+        //Upload background user
+        [HttpPut("UpdateBackgroundUser")]
+        public async Task<IActionResult> UpdateBackgroundUser([FromBody] BackgroundDTO backgroundDTO)
+        {
+            if (backgroundDTO == null) return BadRequest();
+            await _userService.UploadBackgroundUser(backgroundDTO);
+            return Ok("Update background user success");
+        }
+
+        //Get current logged-in user information
+        [HttpGet("GetCurrentUser")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var userId = User.FindFirst(ClaimTypes.Name)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User not authenticated.");
+
+            var user = await _userService.GetUserByIdAsync(userId);
+            if (user == null)
+                return NotFound("User not found.");
+
+            return Ok(user);
+        }   
     }
 }

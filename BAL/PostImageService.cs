@@ -41,5 +41,10 @@ namespace Social_Media.BAL
         {
             return await _repository.GetAllPostImagesByUserID(userId);
         }
+
+        public async Task<List<PostImage>> GetPostImagesByPostIDAsync(int postId)
+        {
+            return await _repository.GetPostImagesByPostID(postId);
+        }
     }
 }

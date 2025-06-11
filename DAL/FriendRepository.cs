@@ -59,10 +59,15 @@ namespace Social_Media.DAL
                 .ToListAsync();
         }
 
-        public async Task<List<Friends>> GetFriendOfEachUser(string userID)
+        public async Task<List<string>> GetFriendOfEachUser(string userID)
         {
-            return await _context.friends.Where(f => f.UserID == userID || f.FriendID == userID).ToListAsync();
+            return await _context.friends
+                .Where(f => f.UserID == userID || f.FriendID == userID)
+                .Select(f => f.UserID == userID ? f.FriendID : f.UserID)
+                .Distinct()
+                .ToListAsync();
         }
+
         public async Task<List<Friends>> GetFriendBaseOnHomeTown(string userId)
         {
             var currentUser = await _context.users.FirstOrDefaultAsync(u => u.Id == userId);

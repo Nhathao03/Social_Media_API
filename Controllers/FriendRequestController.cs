@@ -15,6 +15,7 @@ namespace Social_Media.Controllers
             _friendRequestService = friendRequestService;
         }
 
+        //Add new friend request
         [HttpPost("addFriendRequest")]
         public async Task<IActionResult> addFriendRequest ([FromBody] FriendRequestDTO friendRequestDTO)
         {
@@ -41,6 +42,7 @@ namespace Social_Media.Controllers
             return Ok("Successed !");
         }
 
+        //Get all friend requests
         [HttpGet("getAllFriendsRequest")]
         public async Task<IActionResult> getAllFriendsRequest()
         {
@@ -49,6 +51,7 @@ namespace Social_Media.Controllers
             return Ok(result);
         }
 
+        //Get friend request by ID
         [HttpGet("getFriendsRequestByID/{id}")]
         public async Task<IActionResult> getFriendsRequestByID(int id)
         {
@@ -57,6 +60,7 @@ namespace Social_Media.Controllers
             return Ok(result);
         }
 
+        //Delete friend request by ID
         [HttpDelete("deleteFriendRequestByID/{id}")]
         public async Task<IActionResult> deleteFriendRequest(int id)
         {
@@ -64,6 +68,7 @@ namespace Social_Media.Controllers
             return NoContent();
         }
 
+        //Get friend requests by receiver ID
         [HttpGet("getFriendRequestByReceiverID/{id}")]
         [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false)]
         public async Task<IActionResult> getFriendRequestsBySenderID(string id)
@@ -74,6 +79,7 @@ namespace Social_Media.Controllers
             return Ok(result);
         }
 
+        //Confirm friend request by ID
         [HttpPut("confirmRequest/{id}")]
         public async Task<IActionResult> ConfirmRequest(int id)
         {
@@ -82,6 +88,7 @@ namespace Social_Media.Controllers
             return Ok("Accected friend success !");
         }
 
+        //Reject friend request by ID
         [HttpDelete("rejectFriendRequest/{id}")]
         public async Task<IActionResult> rejectFriendRequest(int id)
         {
@@ -90,6 +97,7 @@ namespace Social_Media.Controllers
             return Ok("Reject friend request success !");
         }
 
+        //Get friend request by user ID
         [HttpGet("getFriendRequestByUserID/{id}")]
         public async Task<IActionResult> getFriendRequestByUserID(string id)
         {

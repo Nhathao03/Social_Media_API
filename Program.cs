@@ -104,6 +104,7 @@ namespace Social_Media
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.MapGet( "/user", () => "Hello World!");
             app.MapControllers();
 
             app.Run();

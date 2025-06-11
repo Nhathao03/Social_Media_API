@@ -10,5 +10,6 @@ namespace Social_Media.BAL
         Task UpdatePostImageAsync(PostImage postimage);
         Task DeletePostImageAsync(int id);
         Task<List<PostImage>> GetAllPostImagesByUserIDAsync(string userId);
+        Task<List<PostImage>> GetPostImagesByPostIDAsync(int postId);
     }
 }

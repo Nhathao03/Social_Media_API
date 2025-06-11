@@ -15,7 +15,7 @@ namespace Social_Media.Controllers
             _friendsService = friendsService;
         }
 
-
+        //Add a friend by ID
         [HttpPost("addFriend/{id}")]
         public async Task<IActionResult> addFriend(int id)
         {             
@@ -23,6 +23,7 @@ namespace Social_Media.Controllers
             return Ok("Add friend success. ");
         }
 
+        //Get all friends by user ID
         [HttpGet("getAllFriendByUserID/{userID}")]
         public async Task<IActionResult> getAllFriendsByUserID(string userID)
         {
@@ -31,6 +32,7 @@ namespace Social_Media.Controllers
             return Ok(response);
         }
 
+        //Get friend recently added by ID
         [HttpGet("getFriendRecentlyAdded/{userId}")]
         public async Task<IActionResult> getFriendRecentlyAdded(string userID)
         {
@@ -39,6 +41,7 @@ namespace Social_Media.Controllers
             return Ok(response);
         }
 
+        //Get friend of each user by user ID
         [HttpGet("getFriendOfEachUser/{userId}")]
         public async Task<IActionResult> getFriendOfEachUser(string userId)
         {
@@ -46,6 +49,8 @@ namespace Social_Media.Controllers
             if (response == null) return NotFound();
             return Ok(response);
         }
+
+        //Get friend base on home town by user ID
         [HttpGet("GetFriendBaseOnHomeTown/{userId}")]
         public async Task<IActionResult> GetFriendBaseOnHomeTown(string userId)
         {

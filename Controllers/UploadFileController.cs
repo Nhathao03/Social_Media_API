@@ -57,5 +57,22 @@ namespace Social_Media.Controllers
             }
             return BadRequest("Image is empty");
         }
+
+        //Upload background user to wwwroot
+        [HttpPost("UploadBackgroundUser")]
+        public async Task<IActionResult> UploadBackgroundUser(IFormFile file)
+        {
+            if (file != null && file.Length > 0)
+            {
+                var savePath = Path.Combine("wwwroot/user/background", file.FileName);
+                using (var fileStream = new FileStream(savePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(fileStream);
+                }
+                string filePath = "user/background/" + file.FileName;
+                return Ok(filePath);
+            }
+            return BadRequest("Image is empty");
+        }
     }
 }

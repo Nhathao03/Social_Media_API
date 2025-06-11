@@ -7,6 +7,7 @@ namespace Social_Media.BAL
     {
         Task<IEnumerable<Comment>> GetAllCommentsAsync();
         Task<Comment> GetCommentByIdAsync(int id);
+        Task<IEnumerable<Comment>> GetCommentByPostIDAsync(int postID);
         Task AddCommentAsync(CommentDTO comment);
         Task UpdateCommentAsync(Comment comment);
         Task DeleteCommentAsync(int id);
