@@ -53,23 +53,9 @@ namespace Social_Media.Controllers
         {
             await _commentService.DeleteCommentAsync(id);
             return NoContent();
-        }
+        }  
 
-        //Add like to comment by ID
-        [HttpPut("AddLikeComment/{id}")]
-        public async Task<IActionResult> AddLikeComment(int id)
-        {
-            var commentData = await _commentService.GetCommentByIdAsync(id);
-            if (commentData == null) return NotFound("Comment not found.");
-
-            commentData.Sticker += 1; 
-
-            await _commentService.UpdateCommentAsync(commentData);
-
-            return NoContent();
-        }
-
-        //Add comment by post ID
+        //Get comment by post ID
         [HttpGet("getCommentByPostID/{postID}")]
         public async Task<IActionResult> getCommentByPostID(int postID)
         {
@@ -85,7 +71,6 @@ namespace Social_Media.Controllers
             if (comment == null) return BadRequest();
             await _commentService.UpdateCommentAsync(comment);
             return Ok("Update comment success");
-        }
-
+        } 
     }
 }

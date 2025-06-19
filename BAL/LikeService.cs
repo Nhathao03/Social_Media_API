@@ -45,11 +45,15 @@ namespace Social_Media.BAL
             await _likeRepository.DeleteLike(id);
         } 
 
-        public async Task<Like?> GetLikeByUserAndPostAsync(string userId, int postId)
+        public async Task<Like?> CheckLikeUserOnPost(string userId, int postId)
         {
            var data = await _likeRepository.GetLikeByUserAndPost(userId, postId);
             return data;
         }
 
+        public async Task<IEnumerable<Like>> GetLikesByPostIdAsync(int postId)
+        {
+            return await _likeRepository.GetLikesByPostId(postId);
+        }
     }
 }

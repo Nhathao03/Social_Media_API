@@ -35,29 +35,6 @@ namespace Social_Media.Controllers
             return Ok(getPostImage);
         }
 
-
-        //CHECK AND REVISE THIS CODE AGAIN
-        //Upload post image
-       
-        public async Task<IActionResult> CreatePost([FromBody] PostDTO postDto)
-        {
-            if (postDto == null || postDto.UserID == null) return BadRequest();
-           
-            if (postDto.PostImages[0] != null)
-            {
-                for (var i = 0; i < postDto.PostImages.Count; i++)
-                {
-                    var images = new PostImage
-                    {
-                        Url = postDto.PostImages[i].Url,
-                        //PostId = post.ID,
-                    };
-                    await _postImageService.AddPostImageAsync(images);
-                }
-            }
-            return Ok("Upload post image susccesss");
-        }
-
         //Get pos image by post ID
         [HttpGet("GetPostImageByPostID/{postId}")]
         public async Task<IActionResult> GetPostImageByPostID(int postId)

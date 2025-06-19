@@ -97,9 +97,13 @@ namespace Social_Media.BAL
         {
             var result = await _userRepository.GetUserById(changePasswordDTO.userID);
             if (result == null) return;
-            if (changePasswordDTO.currentPass != result.Password) return;
-            result.Password = changePasswordDTO.newPass;
-            await _userRepository.UpdateUser(result);
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(changePasswordDTO.currentPass, result.Password);
+            if (isPasswordValid)
+            {
+                string newPass = BCrypt.Net.BCrypt.HashPassword(changePasswordDTO.newPass);
+                result.Password = newPass;
+                await _userRepository.UpdateUser(result);
+            }   
         }
 
         public async Task ManageContact (ManageContactDTO manageContactDTO)

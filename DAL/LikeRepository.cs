@@ -50,5 +50,10 @@ namespace Social_Media.DAL
             return await _context.likes.FirstOrDefaultAsync(l => l.UserId == userId && l.PostId == postId);
         }
 
+        public async Task<IEnumerable<Like>> GetLikesByPostId(int postId)
+        {
+            return await _context.likes.Where(l => l.PostId == postId).ToListAsync();
+        }
+
     }
 }

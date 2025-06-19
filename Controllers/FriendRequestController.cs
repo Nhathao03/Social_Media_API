@@ -15,7 +15,7 @@ namespace Social_Media.Controllers
             _friendRequestService = friendRequestService;
         }
 
-        //Add new friend request
+        //Send or cancel friend request
         [HttpPost("addFriendRequest")]
         public async Task<IActionResult> addFriendRequest ([FromBody] FriendRequestDTO friendRequestDTO)
         {
@@ -42,7 +42,7 @@ namespace Social_Media.Controllers
             return Ok("Successed !");
         }
 
-        //Get all friend requests
+        //Get all requests
         [HttpGet("getAllFriendsRequest")]
         public async Task<IActionResult> getAllFriendsRequest()
         {
@@ -51,7 +51,7 @@ namespace Social_Media.Controllers
             return Ok(result);
         }
 
-        //Get friend request by ID
+        //Get request by ID
         [HttpGet("getFriendsRequestByID/{id}")]
         public async Task<IActionResult> getFriendsRequestByID(int id)
         {
@@ -60,7 +60,7 @@ namespace Social_Media.Controllers
             return Ok(result);
         }
 
-        //Delete friend request by ID
+        //Delete request by ID
         [HttpDelete("deleteFriendRequestByID/{id}")]
         public async Task<IActionResult> deleteFriendRequest(int id)
         {
@@ -68,7 +68,7 @@ namespace Social_Media.Controllers
             return NoContent();
         }
 
-        //Get friend requests by receiver ID
+        //Get requests by receiver ID
         [HttpGet("getFriendRequestByReceiverID/{id}")]
         [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false)]
         public async Task<IActionResult> getFriendRequestsBySenderID(string id)

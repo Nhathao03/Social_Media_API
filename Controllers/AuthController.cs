@@ -25,7 +25,7 @@ namespace Social_Media.Controllers
             _config = configuration;
         }
 
-        //Register account
+        // Register account
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAccount([FromBody] RegisterDTO model)
         {
@@ -36,49 +36,57 @@ namespace Social_Media.Controllers
             bool isEmailExists = existingUsers.Any(user => user.Email == model.Email);
             bool isPhoneNumberExists = existingUsers.Any(user => user.PhoneNumber == model.PhoneNumber);
 
-            if (!isEmailExists & !isPhoneNumberExists)
+            if (isEmailExists || isPhoneNumberExists)
             {
-                await _userService.RegisterAccountAsync(model);
+                return BadRequest("Email or phone number already exists.");
             }
-            else
-            {
-                return BadRequest("Register account failed");
-            }
+
+            // Hash password before save to db
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
+            model.Password = hashedPassword;
+
+            await _userService.RegisterAccountAsync(model);
 
             return Ok(new { message = "User registered successfully!" });
         }
 
-        //Check login account
+        // Login
         [HttpPost("login")]
         public async Task<IActionResult> LoginAccount([FromBody] LoginDTO model)
         {
             if (model == null || string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
                 return BadRequest("Invalid input data.");
+
             var user = (await _userService.GetAllUsersAsync())
                         .FirstOrDefault(u => u.Email == model.Email);
+
             if (user == null)
                 return Unauthorized("Email not found.");
 
-            if (user.Password != model.Password)
+            // Equals password
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, user.Password);
+            if (!isPasswordValid)
             {
                 return Unauthorized("Incorrect password.");
-            } else
+            }
+
+            // Generate JWT token
+            var token = GenerateJwtToken(user.Id);
+
+            // Redirect URL based on user role
+            string redirectURL = "/home";
+            if (await _roleCheckService.IsAdminAsync(user.Id))
             {
-                var token = GenerateJwtToken(user.Id);
+                redirectURL = "/admin";
+            }
 
-                // Check user role
-                string redirectURL = "/home";
-                if (await _roleCheckService.IsAdminAsync(user.Id))
-                {
-                    redirectURL = "/admin";
-                }
-
-                return Ok(new
-                {
-                    token,RedirectURL = redirectURL
-                });
-            }  
+            return Ok(new
+            {
+                token,
+                redirectURL
+            });
         }
+
 
         //Generate JWT Token
         private string GenerateJwtToken(string userID)
