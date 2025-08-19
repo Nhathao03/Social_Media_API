@@ -22,6 +22,10 @@ namespace Social_Media.BAL
         {
             return await _commentRepository.GetCommentById(id);
         }
+        public async Task<IEnumerable<Comment>> GetCommentByPostIDAsync(int postID)
+        {
+            return await _commentRepository.GetCommentByPostID(postID);
+        }
 
         public async Task AddCommentAsync(CommentDTO commentDTO)
         {

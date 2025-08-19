@@ -61,7 +61,7 @@ namespace Social_Media.BAL
            return await _FriendRepository.getFriendRecentlyAdded(userID);
         }
 
-        public async Task<List<Friends>> getFriendOfEachUser(string userId)
+        public async Task<List<string>> getFriendOfEachUser(string userId)
         {
             return await _FriendRepository.GetFriendOfEachUser(userId);
         }

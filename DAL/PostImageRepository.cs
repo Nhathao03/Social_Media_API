@@ -53,5 +53,10 @@ namespace Social_Media.DAL
 
             return postImages;
         }
+
+        public async Task<List<PostImage>> GetPostImagesByPostID(int postId)
+        {
+            return await _context.post_image.Where(pi => pi.PostId == postId).ToListAsync();
+        }
     }
 }

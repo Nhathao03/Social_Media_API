@@ -24,6 +24,10 @@ namespace Social_Media.DAL
             return await _context.users.FirstOrDefaultAsync(p => p.Id == id);
         }
 
+        public async Task<User> GetUserByEmail(string email)
+        {
+            return await _context.users.FirstOrDefaultAsync(p => p.Email == email);
+        }
         public async Task UpdateUser(User user)
         {
             _context.users.Update(user);
@@ -68,6 +72,17 @@ namespace Social_Media.DAL
                     following = u.following
                 })
                 .ToListAsync();
+        }
+
+        // Check exist email
+        public async Task<bool> CheckexistEmail(string email)
+        {
+            var existEmail =  await _context.users.FirstOrDefaultAsync(u => u.Email == email);
+            if (existEmail != null)
+            {
+                return true; // Email already exists
+            }
+            return false; // Email does not exist
         }
 
     }

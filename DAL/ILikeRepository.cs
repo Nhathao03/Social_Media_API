@@ -11,5 +11,7 @@ namespace Social_Media.DAL
         Task UpdateLike(Like like);
         Task DeleteLike(int id);
         Task<Like?> GetLikeByUserAndPost(string userId, int postId);
+        Task<IEnumerable<Like>> GetLikesByPostId(int postId);
+
     }
 }

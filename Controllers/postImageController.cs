@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Social_Media.BAL;
+using Social_Media.Models.DTO;
+using Social_Media.Models;
 
 namespace Social_Media.Controllers
 {
@@ -15,6 +17,7 @@ namespace Social_Media.Controllers
             _postImageService = postImageService;
         }
 
+        //Get all post images
         [HttpGet("GetAllPostImage")]
         public async Task<IActionResult> GetAllPostImage()
         {
@@ -23,12 +26,22 @@ namespace Social_Media.Controllers
             return Ok(getPostImage);
         }
 
+        //Get post image by ID
         [HttpGet("GetPostImagesByUserID/{id}")]
         public async Task<IActionResult> GetPostImagesByUserID(string id)
         {
             var getPostImage = await _postImageService.GetAllPostImagesByUserIDAsync(id);
             if (getPostImage == null) return NotFound();
             return Ok(getPostImage);
+        }
+
+        //Get pos image by post ID
+        [HttpGet("GetPostImageByPostID/{postId}")]
+        public async Task<IActionResult> GetPostImageByPostID(int postId)
+        {
+            var postImage = await _postImageService.GetPostImagesByPostIDAsync(postId);
+            if (postImage == null) return NotFound();
+            return Ok(postImage);
         }
     }
 }

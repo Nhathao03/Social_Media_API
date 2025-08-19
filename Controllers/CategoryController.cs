@@ -18,6 +18,7 @@ namespace Social_Media.Controllers
             _category = category;
         }
 
+        //Get all categories
         [HttpGet("getAllCategory")]
         public async Task<IActionResult> Get()
         {
@@ -25,6 +26,7 @@ namespace Social_Media.Controllers
             return Ok(postcategory);
         }
 
+        //Get category by ID
         [HttpGet("getCategoryByID/{id}")]
         public async Task<IActionResult> Get(int id)
         {
@@ -33,6 +35,7 @@ namespace Social_Media.Controllers
             return Ok(postcategory);
         }
 
+        //Delete category by ID (Admin only)
         [Authorize(Roles = "Admin")]
         [HttpPost("addNewCategory")]
         public async Task<IActionResult> Post([FromBody] PostCategory postcategory)
@@ -40,6 +43,16 @@ namespace Social_Media.Controllers
             if (postcategory == null) return BadRequest();
             await _category.AddPostCategory(postcategory);
             return CreatedAtAction(nameof(Get), new { id = postcategory.ID }, postcategory);
+        }
+
+        //Update category by ID (Admin only)
+        [Authorize(Roles = "Admin")]
+        [HttpPut("updateCategory")]
+        public async Task<IActionResult> Put([FromBody] PostCategory postcategory)
+        {
+            if (postcategory == null) return BadRequest();
+            await _category.UpdatePostCategory(postcategory);
+            return Ok("Update category success");
         }
     }
 }

@@ -32,6 +32,10 @@ namespace Social_Media.BAL
             return await _userRepository.GetUserById(id);
         }
 
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            return await _userRepository.GetUserByEmail(email);
+        }
         public async Task UpdateUserAsync(User user)
         {
             await _userRepository.UpdateUser(user);
@@ -97,9 +101,13 @@ namespace Social_Media.BAL
         {
             var result = await _userRepository.GetUserById(changePasswordDTO.userID);
             if (result == null) return;
-            if (changePasswordDTO.currentPassword != result.Password) return;
-            result.Password = changePasswordDTO.newPassword;
-            await _userRepository.UpdateUser(result);
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(changePasswordDTO.currentPass, result.Password);
+            if (isPasswordValid)
+            {
+                string newPass = BCrypt.Net.BCrypt.HashPassword(changePasswordDTO.newPass);
+                result.Password = newPass;
+                await _userRepository.UpdateUser(result);
+            }   
         }
 
         public async Task ManageContact (ManageContactDTO manageContactDTO)
@@ -110,5 +118,20 @@ namespace Social_Media.BAL
             await _userRepository.UpdateUser(result);
         }
         
+        public async Task UploadBackgroundUser(BackgroundDTO backgroundDTO)
+        {
+            var user = await _userRepository.GetUserById(backgroundDTO.userId);
+            if (user == null ) return;
+            if (backgroundDTO != null)
+            {
+                user.BackgroundProfile = backgroundDTO.backgroundImage;
+                await _userRepository.UpdateUser(user);
+            }
+        }
+
+        public async Task<bool> CheckexistEmail(string email)
+        {
+            return await _userRepository.CheckexistEmail(email);
+        }
     }
 }

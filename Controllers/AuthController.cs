@@ -1,13 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Social_Media.BAL;
+using Social_Media.DAL;
 using Social_Media.Models;
 using Social_Media.Models.DTO;
 using Social_Media.Models.DTO.AccountUser;
+using Social_Media.Models.Email;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using ForgotPasswordRequest = Social_Media.Models.Email.ForgotPasswordRequest;
+using ResetPasswordRequest = Social_Media.Models.Email.ResetPasswordRequest;
 
 namespace Social_Media.Controllers
 {
@@ -18,14 +24,21 @@ namespace Social_Media.Controllers
         private readonly IUserService _userService;
         private readonly IRoleCheckService _roleCheckService;
         private readonly IConfiguration _config;
-        public AuthController(IUserService userService, IRoleCheckService roleCheckService, IConfiguration configuration)
+        private static Dictionary<string, (string Otp, DateTime Expiry)> _otpStore = new();
+        private readonly EmailService _emailService;
+
+        public AuthController(IUserService userService, 
+            IRoleCheckService roleCheckService,
+            IConfiguration configuration,
+            EmailService emailService)
         {
             _userService = userService;
             _roleCheckService = roleCheckService;
             _config = configuration;
+            _emailService = emailService;
         }
 
-        //Register acccount
+        // Register account
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAccount([FromBody] RegisterDTO model)
         {
@@ -36,51 +49,57 @@ namespace Social_Media.Controllers
             bool isEmailExists = existingUsers.Any(user => user.Email == model.Email);
             bool isPhoneNumberExists = existingUsers.Any(user => user.PhoneNumber == model.PhoneNumber);
 
-            if (!isEmailExists & !isPhoneNumberExists)
+            if (isEmailExists || isPhoneNumberExists)
             {
-                await _userService.RegisterAccountAsync(model);
+                return BadRequest("Email or phone number already exists.");
             }
-            else
-            {
-                return BadRequest("Register account failed");
-            }
+
+            // Hash password before save to db
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
+            model.Password = hashedPassword;
+            await _userService.RegisterAccountAsync(model);
 
             return Ok(new { message = "User registered successfully!" });
         }
 
-        //Check login account
+        // Login
         [HttpPost("login")]
         public async Task<IActionResult> LoginAccount([FromBody] LoginDTO model)
         {
             if (model == null || string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
                 return BadRequest("Invalid input data.");
+
             var user = (await _userService.GetAllUsersAsync())
                         .FirstOrDefault(u => u.Email == model.Email);
+
             if (user == null)
                 return Unauthorized("Email not found.");
 
-            if (user.Password != model.Password)
+            // Equals password
+            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, user.Password);
+            if (!isPasswordValid)
             {
                 return Unauthorized("Incorrect password.");
-            } else
+            }
+
+            // Generate JWT token
+            var token = GenerateJwtToken(user.Id);
+
+            // Redirect URL based on user role
+            string redirectURL = "/home";
+            if (await _roleCheckService.IsAdminAsync(user.Id))
             {
-                var token = GenerateJwtToken(user.Id);
+                redirectURL = "/admin";
+            }
 
-                // Check user role
-                string redirectURL = "/home";
-                if (await _roleCheckService.IsAdminAsync(user.Id))
-                {
-                    redirectURL = "/admin";
-                }
-
-                return Ok(new
-                {
-                    token,RedirectURL = redirectURL
-                });
-            }  
+            return Ok(new
+            {
+                token,
+                redirectURL,
+            });
         }
 
-        //Generate token
+        //Generate JWT Token
         private string GenerateJwtToken(string userID)
         {
             var jwtSettings = _config.GetSection("Jwt");
@@ -91,6 +110,14 @@ namespace Social_Media.Controllers
             new Claim(ClaimTypes.Name, userID),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
+
+            string role = "User";
+            if (_roleCheckService.IsAdminAsync(userID).Result)
+            {
+                role = "Admin";
+            }
+
+            claims.Add(new Claim("role", role));
 
             var token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],
@@ -103,6 +130,28 @@ namespace Social_Media.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        //Refresh JWT Token
+        [HttpPost("refreshToken")]
+        public IActionResult RefreshToken([FromBody] string token)
+        {
+            if (string.IsNullOrEmpty(token))
+                return BadRequest("Token is required.");
+
+            var handler = new JwtSecurityTokenHandler();
+            if (!handler.CanReadToken(token))
+                return BadRequest("Invalid token format.");
+
+            var jwtToken = handler.ReadJwtToken(token);
+            var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User not authenticated.");
+
+            var newToken = GenerateJwtToken(userId);
+            return Ok(new { token = newToken });
+        }
+
+        //Decode JWT Token
         [HttpPost("decode")]
         public IActionResult Decode([FromBody] string jwtToken)
         {
@@ -139,6 +188,8 @@ namespace Social_Media.Controllers
             }
         }
 
+        //Get all users
+        [Authorize(Roles = "Admin")]
         [HttpGet("GetAllUser")]
         public async Task<IActionResult> GetAllUser()
         {
@@ -146,19 +197,22 @@ namespace Social_Media.Controllers
             return Ok(getAllUser);
         }
 
-        [HttpGet("GetUserById")]
+        //Get user by ID
+        [HttpGet("GetUserById/{userID}")]
         public async Task<IActionResult> GetUserById(string userID)
         {
             var getUser = await _userService.GetUserByIdAsync(userID);
             return Ok(getUser);
         }
 
+        //Logout user
         [HttpPost("logout")]
         public IActionResult Logout()
         {
             return Ok(new { message = "Logout successful" });
         }
 
+        //Find user by string data (email or phone number)
         [HttpGet("findUser/{stringData}")]
         public async Task<IActionResult> FindUser(string stringData)
         {
@@ -167,6 +221,7 @@ namespace Social_Media.Controllers
             return Ok(user);
         }
 
+        //Update personal information user
         [HttpPut("UpdatePersonalInformation")]
         public async Task<IActionResult> UpdatePersonalInformation([FromBody] PersonalInformationDTO personalInformationDTO)
         {
@@ -175,11 +230,12 @@ namespace Social_Media.Controllers
             return Ok("Success update user.");
         }
 
+        //Change user password
         [HttpPut("ChangePassword")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO changePasswordDTO)
         {
             if (changePasswordDTO == null) return BadRequest();
-            if(changePasswordDTO.newPassword != changePasswordDTO.verifyPaddword)
+            if(changePasswordDTO.newPass != changePasswordDTO.verifyPass)
             {
                 return BadRequest("Verify Password incorrect");
             }
@@ -189,12 +245,90 @@ namespace Social_Media.Controllers
                 return Ok("Success update password user");
             }
         }
+
+        //Change manage contact user
         [HttpPut("ManageContact")]
         public async Task<IActionResult> ManageContact([FromBody] ManageContactDTO manageContactDTO)
-        {
+         {
             if(manageContactDTO == null ) return BadRequest();
             await _userService.ManageContact(manageContactDTO);
             return Ok("Update manage contact success");
+        }
+
+        //Upload background user
+        [HttpPut("UpdateBackgroundUser")]
+        public async Task<IActionResult> UpdateBackgroundUser([FromBody] BackgroundDTO backgroundDTO)
+        {
+            if (backgroundDTO == null) return BadRequest();
+            await _userService.UploadBackgroundUser(backgroundDTO);
+            return Ok("Update background user success");
+        }
+
+        //Get current logged-in user information
+        [HttpGet("GetCurrentUser")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var userId = User.FindFirst(ClaimTypes.Name)?.Value;
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized("User not authenticated.");
+
+            var user = await _userService.GetUserByIdAsync(userId);
+            if (user == null)
+                return NotFound("User not found.");
+
+            return Ok(user);
+        }
+
+        // Forgot Passsword
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
+        {
+            // Check if email is not exist in database
+            if (!await _userService.CheckexistEmail(request.Email))
+            {
+                return BadRequest("Email not exist");
+            }
+
+            // Create OTP 6 numbers
+            var otp = new Random().Next(100000, 999999).ToString();
+
+            // Save OTP 5 minutes
+            _otpStore[request.Email] = (otp, DateTime.UtcNow.AddMinutes(5));
+
+            // Send OTP to Email
+            await _emailService.SendOtpAsync(request.Email, otp);
+
+            return Ok("OTP was send to email");
+        }
+
+        // Reset password
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
+        {
+            // If email don't exist in OTP store, it means forgot password request not sent
+            if (!_otpStore.ContainsKey(request.Email))
+                return BadRequest("Chưa gửi yêu cầu quên mật khẩu");
+
+            var (otp, expiry) = _otpStore[request.Email];
+
+            // Check if OTP is valid and not expired
+            if (otp != request.Otp || DateTime.UtcNow > expiry)
+                return BadRequest("OTP is not valid or not expired");
+
+            if (request.NewPassword != request.ConfirmPassword)
+                return BadRequest("New password and confirm new password do not match");
+
+            var user = await _userService.GetUserByEmailAsync(request.Email);
+            if (user == null) return BadRequest("User not exist");
+
+            // Hash new password by BCrypt
+            user.Password = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+            await _userService.UpdateUserAsync(user);
+
+            // Delete OTP after successful reset
+            _otpStore.Remove(request.Email);
+
+            return Ok("Reset password successful");
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Social_Media.BAL
         Task AddLikeAsync(LikeDTO like);
         Task UpdateLikeAsync(Like like);
         Task DeleteLikeAsync(int id);
-        Task<Like?> GetLikeByUserAndPostAsync(string userId, int postId);
-
+        Task<Like?> CheckLikeUserOnPost(string userId, int postId);
+        Task<IEnumerable<Like>> GetLikesByPostIdAsync(int postId);
     }
 }

@@ -15,5 +15,8 @@ namespace Social_Media.BAL
         Task UpdatePersonalInformation (PersonalInformationDTO personalInformationDTO);
         Task ChangePassword(ChangePasswordDTO changePasswordDTO);
         Task ManageContact(ManageContactDTO manageContactDTO);
+        Task UploadBackgroundUser(BackgroundDTO backgroundDTO);
+        Task<bool> CheckexistEmail(string email);
+        Task<User> GetUserByEmailAsync(string email);
     }
 }

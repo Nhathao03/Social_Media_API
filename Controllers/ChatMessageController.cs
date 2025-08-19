@@ -20,14 +20,16 @@ namespace Social_Media.Controllers
             _hubContext = hubContext;
         }
 
-        [HttpGet]
+        //Get all messages
+        [HttpGet("getAllMessages")]
         public async Task<ActionResult<IEnumerable<Message>>> GetAllMessages()
         {
             var messages = await _messageService.GetAllMessageAsync();
             return Ok(messages);
         }
 
-        [HttpGet("{id}")]
+        //Get message by ID
+        [HttpGet("getMessageById/{id}")]
         public async Task<ActionResult<Message>> GetMessage(int id)
         {
             var message = await _messageService.GetMessageByIdAsync(id);
@@ -38,6 +40,7 @@ namespace Social_Media.Controllers
             return Ok(message);
         }
 
+        //Send message
         [HttpPost("sendMessage")]
         public async Task<IActionResult> SendMessage([FromBody] MessageDTO messageDTO)
         {
@@ -57,7 +60,8 @@ namespace Social_Media.Controllers
             }
         }
 
-        [HttpGet("getMessages/{receiverID}/{senderID}")]
+        //Get messages by receiver and sender IDs
+        [HttpGet("getMessage/{receiverID}/{senderID}")]
         public async Task<IActionResult> GetMessages(string receiverID, string senderID)
         {
             try
@@ -75,8 +79,8 @@ namespace Social_Media.Controllers
             }
         }
 
-
-        [HttpPut("{id}")]
+        // Update message by ID
+        [HttpPut("updateMessage/{id}")]
         public async Task<IActionResult> UpdateMessage(int id, [FromBody] Message message)
         {
             if (id != message.ID)
@@ -95,7 +99,8 @@ namespace Social_Media.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        //Delete message by ID
+        [HttpDelete("deleteMessage/{id}")]
         public async Task<IActionResult> DeleteMessage(int id)
         {
             try
