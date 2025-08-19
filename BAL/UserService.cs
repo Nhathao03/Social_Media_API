@@ -32,6 +32,10 @@ namespace Social_Media.BAL
             return await _userRepository.GetUserById(id);
         }
 
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+            return await _userRepository.GetUserByEmail(email);
+        }
         public async Task UpdateUserAsync(User user)
         {
             await _userRepository.UpdateUser(user);
@@ -123,6 +127,11 @@ namespace Social_Media.BAL
                 user.BackgroundProfile = backgroundDTO.backgroundImage;
                 await _userRepository.UpdateUser(user);
             }
+        }
+
+        public async Task<bool> CheckexistEmail(string email)
+        {
+            return await _userRepository.CheckexistEmail(email);
         }
     }
 }

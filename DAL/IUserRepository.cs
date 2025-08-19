@@ -12,5 +12,7 @@ namespace Social_Media.DAL
         Task DeleteUser(string id);
         Task RegisterAccount(User user);
         Task<List<User>> FindUser(string stringData);
+        Task<bool> CheckexistEmail(string email);
+        Task<User> GetUserByEmail(string email);
     }
 }

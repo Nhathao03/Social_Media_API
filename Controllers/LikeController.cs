@@ -19,6 +19,7 @@ namespace Social_Media.Controllers
             _commentService = commentService;
         }
 
+        //Add like to post
         [HttpPost("AddLike")]
         public async Task<IActionResult> AddLike([FromBody] LikeDTO likeDTO)
         {
@@ -35,6 +36,7 @@ namespace Social_Media.Controllers
             return Ok("Add new like post sucess !");
         }
 
+        //Get all likes
         [HttpGet("GetAllLike")]
         public async Task<IActionResult> getAllLike()
         {
@@ -43,7 +45,8 @@ namespace Social_Media.Controllers
             return Ok(like);
         }
 
-        [HttpGet("{id}")]
+        //Get like by ID
+        [HttpGet("getLikebyId/{id}")]
         public async Task<IActionResult> getLikeByID (int id)
         {
             var like  = _likeService.GetLikeByIdAsync(id);
@@ -51,7 +54,8 @@ namespace Social_Media.Controllers
             return Ok(like);
         }
 
-        [HttpDelete("{id}")]
+        //Delete like by ID
+        [HttpDelete("deleteLikeByID/{id}")]
         public async Task<IActionResult> deleteLikeByID(int id)
         {
             await _likeService.DeleteLikeAsync(id);
@@ -59,7 +63,7 @@ namespace Social_Media.Controllers
         }
 
         //Add like to comment by ID
-        [HttpPut("AddLikeComment/{id}")]
+        [HttpPost("AddLikeComment/{id}")]
         public async Task<IActionResult> AddLikeComment(int id)
         {
             var commentData = await _commentService.GetCommentByIdAsync(id);

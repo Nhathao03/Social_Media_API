@@ -55,5 +55,16 @@ namespace Social_Media.Controllers
             await _addressService.UpdateAddressAsync(address);
             return Ok("Update address success");
         }
+
+        //Delete address by ID (Admin only)
+        [Authorize(Roles = "Admin")]
+        [HttpDelete("deleteAddressByID/{id}")]
+        public async Task<IActionResult> deleteAddressByID(int id)
+        {
+            var address = await _addressService.GetAddressByIdAsync(id);
+            if (address == null) return NotFound();
+            await _addressService.DeleteAddressAsync(id);
+            return NoContent();
+        }
     }
 }

@@ -64,6 +64,8 @@ namespace Social_Media
             builder.Services.AddScoped<IFriendsService, FriendService>();
             builder.Services.AddScoped<IMessageService, MessageService>();
 
+            // Add Identity services
+            builder.Services.AddScoped<EmailService>();
             builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
             // Add services to the container.
 

@@ -55,6 +55,7 @@ namespace Social_Media.Controllers
             return CreatedAtAction(nameof(GetAllPost), new { id = post.ID }, postDto);
         }
 
+        //Get all post
         [HttpGet("getAllPost")]
         [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false)]
         public async Task<IActionResult> GetAllPost()
@@ -64,14 +65,16 @@ namespace Social_Media.Controllers
             return Ok(posts);
         }
 
+        //Get post by ID
         [HttpGet("getPostByID/{id}")] 
         public async Task<IActionResult> GetPostById(int id)
         {
             var post = await _postService.GetPostByIdAsync(id);
             if (post == null) return NotFound();
             return Ok(post);
-        }    
+        }
 
+        //Update post by ID
         [HttpPut("updatePost/{id}")]
         public async Task<IActionResult> UpdatePost(int id, [FromBody] Post post)
         {
@@ -80,6 +83,7 @@ namespace Social_Media.Controllers
             return NoContent();
         }
 
+        //Delete post by ID
         [HttpDelete("deletePostByID/{id}")]
         public async Task<IActionResult> DeletePost(int id)
         {
@@ -87,6 +91,7 @@ namespace Social_Media.Controllers
             return NoContent();
         }
 
+        //Get post by user ID
         [HttpGet("getPostsByUserID/{userID}")]
         [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false)]
         public async Task<IActionResult> GetPostsByuserID(string userID)
@@ -96,6 +101,7 @@ namespace Social_Media.Controllers
             return Ok(posts);
         }
 
+        // Get all post nearest created at
         [HttpGet("GetAllPostNearestCreatedAt")]
         [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false)]
         public async Task<IActionResult> GetAllPostNearestCreatedAt()

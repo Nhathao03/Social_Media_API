@@ -1,13 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Social_Media.BAL;
+using Social_Media.DAL;
 using Social_Media.Models;
 using Social_Media.Models.DTO;
 using Social_Media.Models.DTO.AccountUser;
+using Social_Media.Models.Email;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using ForgotPasswordRequest = Social_Media.Models.Email.ForgotPasswordRequest;
+using ResetPasswordRequest = Social_Media.Models.Email.ResetPasswordRequest;
 
 namespace Social_Media.Controllers
 {
@@ -18,11 +24,18 @@ namespace Social_Media.Controllers
         private readonly IUserService _userService;
         private readonly IRoleCheckService _roleCheckService;
         private readonly IConfiguration _config;
-        public AuthController(IUserService userService, IRoleCheckService roleCheckService, IConfiguration configuration)
+        private static Dictionary<string, (string Otp, DateTime Expiry)> _otpStore = new();
+        private readonly EmailService _emailService;
+
+        public AuthController(IUserService userService, 
+            IRoleCheckService roleCheckService,
+            IConfiguration configuration,
+            EmailService emailService)
         {
             _userService = userService;
             _roleCheckService = roleCheckService;
             _config = configuration;
+            _emailService = emailService;
         }
 
         // Register account
@@ -44,7 +57,6 @@ namespace Social_Media.Controllers
             // Hash password before save to db
             string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
             model.Password = hashedPassword;
-
             await _userService.RegisterAccountAsync(model);
 
             return Ok(new { message = "User registered successfully!" });
@@ -83,10 +95,9 @@ namespace Social_Media.Controllers
             return Ok(new
             {
                 token,
-                redirectURL
+                redirectURL,
             });
         }
-
 
         //Generate JWT Token
         private string GenerateJwtToken(string userID)
@@ -99,6 +110,14 @@ namespace Social_Media.Controllers
             new Claim(ClaimTypes.Name, userID),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
+
+            string role = "User";
+            if (_roleCheckService.IsAdminAsync(userID).Result)
+            {
+                role = "Admin";
+            }
+
+            claims.Add(new Claim("role", role));
 
             var token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],
@@ -170,6 +189,7 @@ namespace Social_Media.Controllers
         }
 
         //Get all users
+        [Authorize(Roles = "Admin")]
         [HttpGet("GetAllUser")]
         public async Task<IActionResult> GetAllUser()
         {
@@ -178,7 +198,7 @@ namespace Social_Media.Controllers
         }
 
         //Get user by ID
-        [HttpGet("GetUserById")]
+        [HttpGet("GetUserById/{userID}")]
         public async Task<IActionResult> GetUserById(string userID)
         {
             var getUser = await _userService.GetUserByIdAsync(userID);
@@ -257,6 +277,58 @@ namespace Social_Media.Controllers
                 return NotFound("User not found.");
 
             return Ok(user);
-        }   
+        }
+
+        // Forgot Passsword
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
+        {
+            // Check if email is not exist in database
+            if (!await _userService.CheckexistEmail(request.Email))
+            {
+                return BadRequest("Email not exist");
+            }
+
+            // Create OTP 6 numbers
+            var otp = new Random().Next(100000, 999999).ToString();
+
+            // Save OTP 5 minutes
+            _otpStore[request.Email] = (otp, DateTime.UtcNow.AddMinutes(5));
+
+            // Send OTP to Email
+            await _emailService.SendOtpAsync(request.Email, otp);
+
+            return Ok("OTP was send to email");
+        }
+
+        // Reset password
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
+        {
+            // If email don't exist in OTP store, it means forgot password request not sent
+            if (!_otpStore.ContainsKey(request.Email))
+                return BadRequest("Chưa gửi yêu cầu quên mật khẩu");
+
+            var (otp, expiry) = _otpStore[request.Email];
+
+            // Check if OTP is valid and not expired
+            if (otp != request.Otp || DateTime.UtcNow > expiry)
+                return BadRequest("OTP is not valid or not expired");
+
+            if (request.NewPassword != request.ConfirmPassword)
+                return BadRequest("New password and confirm new password do not match");
+
+            var user = await _userService.GetUserByEmailAsync(request.Email);
+            if (user == null) return BadRequest("User not exist");
+
+            // Hash new password by BCrypt
+            user.Password = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+            await _userService.UpdateUserAsync(user);
+
+            // Delete OTP after successful reset
+            _otpStore.Remove(request.Email);
+
+            return Ok("Reset password successful");
+        }
     }
 }
