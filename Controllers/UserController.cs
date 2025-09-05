@@ -95,6 +95,7 @@ namespace Social_Media.Controllers
         [HttpPut("ManageContact")]
         public async Task<IActionResult> ManageContact([FromBody] ManageContactDTO manageContactDTO)
          {
+            // check valid model
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
