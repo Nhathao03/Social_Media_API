@@ -17,5 +17,6 @@ namespace Social_Media.Models
 
 		// Navigation properties
 		public Post Post { get; set; }
-	}
+        public User user { get; set; }
+    }
 }

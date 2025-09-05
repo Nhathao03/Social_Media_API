@@ -9,6 +9,7 @@ namespace Social_Media.DAL
         Task AddMessage(Message Message);
         Task UpdateMessage(Message Message);
         Task DeleteMessage(int id);
-        Task<List<Message>> GetMessageByReceiverID(string ReceiverID, string SenderID);
+        Task<List<Message>> GetMessageByReceiverIdAndSenderId(string userId1, string userId2);
+        Task<List<Message>> GetMessageLastest(string userId1, string userId2);
     }
 }

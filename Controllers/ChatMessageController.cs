@@ -46,6 +46,10 @@ namespace Social_Media.Controllers
         {
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
                 await _messageService.AddMessageAsync(messageDTO);
                 
                 // Send real-time notifications using SignalR
@@ -61,12 +65,12 @@ namespace Social_Media.Controllers
         }
 
         //Get messages by receiver and sender IDs
-        [HttpGet("getMessage/{receiverID}/{senderID}")]
-        public async Task<IActionResult> GetMessages(string receiverID, string senderID)
+        [HttpGet("getMessage/{userId1}/{userId2}")]
+        public async Task<IActionResult> GetMessages(string userId1, string userId2)
         {
             try
             {
-                var messages = await _messageService.GetMessageByReceiverIDAsync(receiverID, senderID);
+                var messages = await _messageService.GetMessageByReceiverIdAndSenderIdAsync(userId1, userId2);
                 if (messages == null || !messages.Any())
                 {
                     return NotFound(new { message = "No messages found" });
@@ -90,6 +94,10 @@ namespace Social_Media.Controllers
 
             try
             {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
                 await _messageService.UpdateMessageAsync(message);
                 return Ok(new { message = "Message updated successfully" });
             }
@@ -107,6 +115,25 @@ namespace Social_Media.Controllers
             {
                 await _messageService.DeleteMessageAsync(id);
                 return Ok(new { message = "Message deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // Get latest message between two users
+        [HttpGet("getLastestMessage/{userId1}/{userId2}")]
+        public async Task<IActionResult> GetLatestMessage(string userId1, string userId2)
+        {
+            try
+            {
+                var latestMessage = await _messageService.GetMessageLastestAsync(userId1, userId2);
+                if (latestMessage == null || !latestMessage.Any())
+                {
+                    return NotFound(new { message = "No latest message found" });
+                }
+                return Ok(latestMessage);
             }
             catch (Exception ex)
             {

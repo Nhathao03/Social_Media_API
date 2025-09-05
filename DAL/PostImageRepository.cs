@@ -22,9 +22,9 @@ namespace Social_Media.DAL
             return await _context.post_image.FirstOrDefaultAsync(p => p.ID == id);
         }
 
-        public async Task AddPostImage(PostImage postImage)
+        public async Task AddPostImage(List<PostImage> postImages)
         {
-            _context.post_image.AddAsync(postImage);
+            _context.post_image.AddRange(postImages);
             await _context.SaveChangesAsync();
         }
 

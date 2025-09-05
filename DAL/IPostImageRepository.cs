@@ -6,7 +6,7 @@ namespace Social_Media.DAL
     {
         Task<IEnumerable<PostImage>> GetAllPostImage();
         Task<PostImage> GetPostImageById(int id);
-        Task AddPostImage(PostImage post);
+        Task AddPostImage(List<PostImage> post);
         Task UpdatePostImage(PostImage post);
         Task DeletePostImage(int id);
         Task<List<PostImage>> GetAllPostImagesByUserID(string userId);

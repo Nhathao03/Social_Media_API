@@ -11,8 +11,9 @@ namespace Social_Media.DAL
         Task UpdateUser(User user);
         Task DeleteUser(string id);
         Task RegisterAccount(User user);
-        Task<List<User>> FindUser(string stringData);
-        Task<bool> CheckexistEmail(string email);
+        Task<List<User>> FindUser(string stringData, string CurrentUserIdSearch);
+        Task<bool> IsEmailExistsAsync(string email);
+        Task<bool> IsPhoneExistsAsync(string phoneNumber);
         Task<User> GetUserByEmail(string email);
     }
 }

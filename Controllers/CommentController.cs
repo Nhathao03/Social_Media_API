@@ -23,7 +23,10 @@ namespace Social_Media.Controllers
         [HttpPost("CreateNewComment")]
         public async Task<IActionResult> CreateNewComment([FromBody] CommentDTO commentDTO)
         {
-            if (commentDTO == null) return BadRequest();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             await _commentService.AddCommentAsync(commentDTO);
             return Ok("Create new comment success !");
         }
@@ -68,7 +71,10 @@ namespace Social_Media.Controllers
         [HttpPut("updateComment")]
         public async Task<IActionResult> updateComment([FromBody] Comment comment)
         {
-            if (comment == null) return BadRequest();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             await _commentService.UpdateCommentAsync(comment);
             return Ok("Update comment success");
         } 

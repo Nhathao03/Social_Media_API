@@ -19,7 +19,10 @@ namespace Social_Media.Controllers
         [HttpPost("addFriendRequest")]
         public async Task<IActionResult> addFriendRequest ([FromBody] FriendRequestDTO friendRequestDTO)
         {
-            if (friendRequestDTO == null) return BadRequest();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var result = await _friendRequestService.GetAllFriendRequestAsync();
             bool existingFriend = result.Any(s => s.SenderID == friendRequestDTO.SenderID && s.ReceiverID == friendRequestDTO.ReceiverID);
             var listRequest = result.ToList();

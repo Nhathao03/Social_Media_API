@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Social_Media.BAL;
 using Social_Media.Models;
 using Social_Media.Models.DTO;
+using System.Drawing.Printing;
 
 
 namespace Social_Media.Controllers
@@ -27,32 +28,15 @@ namespace Social_Media.Controllers
         [HttpPost("CreatePost")]
         public async Task<IActionResult> CreatePost([FromBody] PostDTO postDto)
         {
-            if (postDto == null || postDto.UserID == null) return BadRequest();
-            var post = new Post
+            if (!ModelState.IsValid)
             {
-                UserID = postDto.UserID,
-                Content = postDto.Content,
-                Views = postDto.Views ?? 0,
-                Share = postDto.Share ?? 0,
-                PostCategoryID = postDto.PostCategoryID,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
-            await _postService.AddPostAsync(post);
-
-            if(postDto.PostImages[0] != null)
-            {
-                for (var i = 0; i < postDto.PostImages.Count; i++)
-                {
-                    var images = new PostImage
-                    {
-                        Url = postDto.PostImages[i].Url,
-                        PostId = post.ID,
-                    };
-                    await _postImageService.AddPostImageAsync(images);
-                }
+                return BadRequest(ModelState);
             }
-            return CreatedAtAction(nameof(GetAllPost), new { id = post.ID }, postDto);
+
+            var createPost = await _postService.AddPostAsync(postDto);
+            await _postImageService.AddPostImageAsync(postDto, createPost.ID);
+
+            return CreatedAtAction(nameof(GetAllPost), new { id = createPost.ID }, createPost);
         }
 
         //Get all post
@@ -78,6 +62,10 @@ namespace Social_Media.Controllers
         [HttpPut("updatePost/{id}")]
         public async Task<IActionResult> UpdatePost(int id, [FromBody] Post post)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             if (post == null || post.ID != id) return BadRequest();
             await _postService.UpdatePostAsync(post);
             return NoContent();
@@ -102,11 +90,11 @@ namespace Social_Media.Controllers
         }
 
         // Get all post nearest created at
-        [HttpGet("GetAllPostNearestCreatedAt")]
+        [HttpGet("GetRecentPostCreated")]
         [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any, NoStore = false)]
-        public async Task<IActionResult> GetAllPostNearestCreatedAt()
+        public async Task<IActionResult> GetRecentPostCreated()
         {
-            var result = await _postService.GetAllPostNearestCreatedAtAsync();
+            var result = await _postService.GetRecentPostsAsync(1,10);
             if (result == null) return NotFound();
             return Ok(result);
         }

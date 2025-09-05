@@ -40,7 +40,10 @@ namespace Social_Media.Controllers
         [HttpPost("addNewCategory")]
         public async Task<IActionResult> Post([FromBody] PostCategory postcategory)
         {
-            if (postcategory == null) return BadRequest();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             await _category.AddPostCategory(postcategory);
             return CreatedAtAction(nameof(Get), new { id = postcategory.ID }, postcategory);
         }
@@ -50,7 +53,10 @@ namespace Social_Media.Controllers
         [HttpPut("updateCategory")]
         public async Task<IActionResult> Put([FromBody] PostCategory postcategory)
         {
-            if (postcategory == null) return BadRequest();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             await _category.UpdatePostCategory(postcategory);
             return Ok("Update category success");
         }

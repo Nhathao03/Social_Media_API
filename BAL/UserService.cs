@@ -7,6 +7,7 @@ using Social_Media.DAL;
 using Social_Media.Models;
 using Social_Media.Models.DTO;
 using Social_Media.Models.DTO.AccountUser;
+using System.Text;
 
 namespace Social_Media.BAL
 {
@@ -46,7 +47,7 @@ namespace Social_Media.BAL
             await _userRepository.DeleteUser(id);
         }
 
-        //Render userID
+        //Generate userID
         private string GenerateUserID()
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -54,6 +55,7 @@ namespace Social_Media.BAL
               .Select(s => s[new Random().Next(s.Length)]).ToArray());
         }
 
+        //Register account
         public async Task RegisterAccountAsync(RegisterDTO registerDTO)
         {
             var user = new User
@@ -65,7 +67,10 @@ namespace Social_Media.BAL
                 Fullname = registerDTO.FullName,
                 Birth = registerDTO.Birth,
                 gender = null,
-                Avatar = "user/avatar/avatar_user.png"
+                Avatar = "user/avatar/avatar_user.png",
+                BackgroundProfile = "user/background/1.jpg",
+                NormalizeEmail = NormalizeString(registerDTO.Email),
+                NormalizeUsername = NormalizeString(registerDTO.FullName),
             };
             await _userRepository.RegisterAccount(user);
             var roleUser = new RoleCheck
@@ -76,9 +81,30 @@ namespace Social_Media.BAL
             await _roleCheckRepository.AddRoleCheck(roleUser);
         }
 
-        public async Task<List<User>> FindUserAsync(string stringData)
+        // Normalize string by removing diacritics and converting to lowercase
+        private static string NormalizeString(string input)
         {
-            return await _userRepository.FindUser(stringData);
+            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+
+            input = input.ToLowerInvariant();
+            var normalized = input.Normalize(System.Text.NormalizationForm.FormD);
+            var sb = new StringBuilder();
+            foreach (var c in normalized)
+            {
+                var unicodeCategory = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != System.Globalization.UnicodeCategory.NonSpacingMark)
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString().Normalize(System.Text.NormalizationForm.FormC);
+        }
+
+        //Find user by username || phonenumber || email
+        public async Task<List<User>> FindUserAsync(string stringData, string CurrentUserIdSearch)
+        {
+            string normalizedData = NormalizeString(stringData);
+            return await _userRepository.FindUser(normalizedData, CurrentUserIdSearch);
         }
 
         //Update information user
@@ -129,9 +155,14 @@ namespace Social_Media.BAL
             }
         }
 
-        public async Task<bool> CheckexistEmail(string email)
+        public async Task<bool> IsEmailExistsAsync(string email)
         {
-            return await _userRepository.CheckexistEmail(email);
+            return await _userRepository.IsEmailExistsAsync(email);
+        }
+
+        public async Task<bool> IsPhoneExistsAsync(string phoneNumber)
+        {
+            return await _userRepository.IsPhoneExistsAsync(phoneNumber);
         }
     }
 }

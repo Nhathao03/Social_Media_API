@@ -16,8 +16,10 @@ namespace Social_Media.Models
 		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 		public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-		// Navigation properties
-		public ICollection<Comment>? Comments { get; set; }
+        public User user { get; set; }
+
+        // Navigation properties
+        public ICollection<Comment>? Comments { get; set; }
 		public ICollection<Like>? Likes { get; set; }
 	}
 }

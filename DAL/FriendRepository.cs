@@ -52,9 +52,9 @@ namespace Social_Media.DAL
 
         public async Task<List<Friends>> getFriendRecentlyAdded(string userID)
         {
-            var fiveDaysAgo = DateTime.UtcNow.AddDays(-3);
+            var threeDaysAgo = DateTime.UtcNow.AddDays(-3);
             return await _context.friends
-                .Where(f => f.UserID == userID && f.CreatedDate >= fiveDaysAgo)
+                .Where(f => f.UserID == userID && f.CreatedDate >= threeDaysAgo || f.FriendID == userID && f.CreatedDate >= threeDaysAgo)
                 .OrderBy(m => m.CreatedDate)
                 .ToListAsync();
         }

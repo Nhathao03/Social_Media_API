@@ -20,7 +20,10 @@ namespace Social_Media.Controllers
         [HttpPost("addTypeFriend")]
         public async Task<IActionResult> addTypeFriend([FromBody] TypeFriendsDTO typeFriendsDTO)
         {
-            if (typeFriendsDTO == null) return BadRequest();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             await _typeFriendsService.AddTypeFriendsAsync(typeFriendsDTO);
             return Ok("add success !");
         }

@@ -11,12 +11,13 @@ namespace Social_Media.BAL
         Task UpdateUserAsync(User user);
         Task DeleteUserAsync(string id);
         Task RegisterAccountAsync (RegisterDTO registerDTO);
-        Task<List<User>> FindUserAsync(string stringData);
+        Task<List<User>> FindUserAsync(string stringData, string CurrentUserIdSearch);
         Task UpdatePersonalInformation (PersonalInformationDTO personalInformationDTO);
         Task ChangePassword(ChangePasswordDTO changePasswordDTO);
         Task ManageContact(ManageContactDTO manageContactDTO);
         Task UploadBackgroundUser(BackgroundDTO backgroundDTO);
-        Task<bool> CheckexistEmail(string email);
+        Task<bool> IsEmailExistsAsync(string email);
+        Task<bool> IsPhoneExistsAsync(string phoneNumber);
         Task<User> GetUserByEmailAsync(string email);
     }
 }

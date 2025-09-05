@@ -1,20 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity.Data;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 using Social_Media.BAL;
-using Social_Media.DAL;
 using Social_Media.Models;
 using Social_Media.Models.DTO;
-using Social_Media.Models.DTO.AccountUser;
-using Social_Media.Models.Email;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using ForgotPasswordRequest = Social_Media.Models.Email.ForgotPasswordRequest;
-using ResetPasswordRequest = Social_Media.Models.Email.ResetPasswordRequest;
-
 namespace Social_Media.Controllers
 {
     [Route("api/auth")]
@@ -25,38 +16,36 @@ namespace Social_Media.Controllers
         private readonly IRoleCheckService _roleCheckService;
         private readonly IConfiguration _config;
         private static Dictionary<string, (string Otp, DateTime Expiry)> _otpStore = new();
-        private readonly EmailService _emailService;
 
-        public AuthController(IUserService userService, 
+        public AuthController(IUserService userService,
             IRoleCheckService roleCheckService,
-            IConfiguration configuration,
-            EmailService emailService)
+            IConfiguration configuration)
         {
             _userService = userService;
             _roleCheckService = roleCheckService;
             _config = configuration;
-            _emailService = emailService;
         }
 
         // Register account
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAccount([FromBody] RegisterDTO model)
         {
+            // check valid model
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             if (model == null || string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
                 return BadRequest("Invalid input data.");
 
-            var existingUsers = await _userService.GetAllUsersAsync();
-            bool isEmailExists = existingUsers.Any(user => user.Email == model.Email);
-            bool isPhoneNumberExists = existingUsers.Any(user => user.PhoneNumber == model.PhoneNumber);
 
-            if (isEmailExists || isPhoneNumberExists)
-            {
-                return BadRequest("Email or phone number already exists.");
-            }
+            if(await _userService.IsEmailExistsAsync(model.Email))
+                return BadRequest("Email already in use.");
+            if (!string.IsNullOrEmpty(model.PhoneNumber) && await _userService.IsPhoneExistsAsync(model.PhoneNumber))
+                return BadRequest("Phone number already in use.");
 
             // Hash password before save to db
-            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(model.Password);
-            model.Password = hashedPassword;
+            model.Password = BCrypt.Net.BCrypt.HashPassword(model.Password);
             await _userService.RegisterAccountAsync(model);
 
             return Ok(new { message = "User registered successfully!" });
@@ -66,31 +55,30 @@ namespace Social_Media.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> LoginAccount([FromBody] LoginDTO model)
         {
+            // check valid model
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
             if (model == null || string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
                 return BadRequest("Invalid input data.");
 
-            var user = (await _userService.GetAllUsersAsync())
-                        .FirstOrDefault(u => u.Email == model.Email);
-
+            // Get user by email
+            var user = await _userService.GetUserByEmailAsync(model.Email);
             if (user == null)
                 return Unauthorized("Email not found.");
 
             // Equals password
-            bool isPasswordValid = BCrypt.Net.BCrypt.Verify(model.Password, user.Password);
-            if (!isPasswordValid)
-            {
+            if (!BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
                 return Unauthorized("Incorrect password.");
-            }
+
+            // Get user role
+            bool isAdmin = await _roleCheckService.IsAdminAsync(user.Id);
+            string role = isAdmin ? "Admin" : "User";
 
             // Generate JWT token
-            var token = GenerateJwtToken(user.Id);
+            var token = GenerateJwtToken(user.Id, role);
 
             // Redirect URL based on user role
-            string redirectURL = "/home";
-            if (await _roleCheckService.IsAdminAsync(user.Id))
-            {
-                redirectURL = "/admin";
-            }
+            string redirectURL = isAdmin ? "/admin" : "/home";
 
             return Ok(new
             {
@@ -100,24 +88,17 @@ namespace Social_Media.Controllers
         }
 
         //Generate JWT Token
-        private string GenerateJwtToken(string userID)
+        private string GenerateJwtToken(string userID, string role)
         {
             var jwtSettings = _config.GetSection("Jwt");
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
 
             var claims = new List<Claim>
             {
-            new Claim(ClaimTypes.Name, userID),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(ClaimTypes.Name, userID),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.Role, role)
             };
-
-            string role = "User";
-            if (_roleCheckService.IsAdminAsync(userID).Result)
-            {
-                role = "Admin";
-            }
-
-            claims.Add(new Claim("role", role));
 
             var token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],
@@ -143,11 +124,12 @@ namespace Social_Media.Controllers
 
             var jwtToken = handler.ReadJwtToken(token);
             var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            var role = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized("User not authenticated.");
 
-            var newToken = GenerateJwtToken(userId);
+            var newToken = GenerateJwtToken(userId, role);
             return Ok(new { token = newToken });
         }
 
@@ -155,22 +137,28 @@ namespace Social_Media.Controllers
         [HttpPost("decode")]
         public IActionResult Decode([FromBody] string jwtToken)
         {
+
+            if (string.IsNullOrWhiteSpace(jwtToken))
+                return BadRequest("Token is required.");
+
+            var handler = new JwtSecurityTokenHandler();
+
+            if (!handler.CanReadToken(jwtToken))
+                return BadRequest("Invalid JWT format.");
             try
             {
-                if (string.IsNullOrWhiteSpace(jwtToken))
-                    return BadRequest("Token is required.");
-
-                var handler = new JwtSecurityTokenHandler();
-
-                if (!handler.CanReadToken(jwtToken))
-                    return BadRequest("Invalid JWT format.");
-
                 var token = handler.ReadJwtToken(jwtToken);
 
+                // Map claim key to easy readable keys
+                var claimKeyMap = new Dictionary<string, string>
+                {
+                    {"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", "userID" },
+                    {"http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "role" },
+                };
                 // Transform claims dictionary
                 var payload = token.Payload
-                    .ToDictionary(kvp =>
-                        kvp.Key == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name" ? "userID" : kvp.Key,
+                    .ToDictionary(
+                        kvp => claimKeyMap.ContainsKey(kvp.Key) ? claimKeyMap[kvp.Key] : kvp.Key,
                         kvp => kvp.Value
                     );
 
@@ -188,23 +176,6 @@ namespace Social_Media.Controllers
             }
         }
 
-        //Get all users
-        [Authorize(Roles = "Admin")]
-        [HttpGet("GetAllUser")]
-        public async Task<IActionResult> GetAllUser()
-        {
-            var getAllUser = await _userService.GetAllUsersAsync();
-            return Ok(getAllUser);
-        }
-
-        //Get user by ID
-        [HttpGet("GetUserById/{userID}")]
-        public async Task<IActionResult> GetUserById(string userID)
-        {
-            var getUser = await _userService.GetUserByIdAsync(userID);
-            return Ok(getUser);
-        }
-
         //Logout user
         [HttpPost("logout")]
         public IActionResult Logout()
@@ -212,123 +183,5 @@ namespace Social_Media.Controllers
             return Ok(new { message = "Logout successful" });
         }
 
-        //Find user by string data (email or phone number)
-        [HttpGet("findUser/{stringData}")]
-        public async Task<IActionResult> FindUser(string stringData)
-        {
-            var user = await _userService.FindUserAsync(stringData);
-            if (user == null) return NotFound();
-            return Ok(user);
-        }
-
-        //Update personal information user
-        [HttpPut("UpdatePersonalInformation")]
-        public async Task<IActionResult> UpdatePersonalInformation([FromBody] PersonalInformationDTO personalInformationDTO)
-        {
-            if (personalInformationDTO == null) return BadRequest();
-            await _userService.UpdatePersonalInformation(personalInformationDTO);
-            return Ok("Success update user.");
-        }
-
-        //Change user password
-        [HttpPut("ChangePassword")]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO changePasswordDTO)
-        {
-            if (changePasswordDTO == null) return BadRequest();
-            if(changePasswordDTO.newPass != changePasswordDTO.verifyPass)
-            {
-                return BadRequest("Verify Password incorrect");
-            }
-            else
-            {
-                await _userService.ChangePassword(changePasswordDTO);
-                return Ok("Success update password user");
-            }
-        }
-
-        //Change manage contact user
-        [HttpPut("ManageContact")]
-        public async Task<IActionResult> ManageContact([FromBody] ManageContactDTO manageContactDTO)
-         {
-            if(manageContactDTO == null ) return BadRequest();
-            await _userService.ManageContact(manageContactDTO);
-            return Ok("Update manage contact success");
-        }
-
-        //Upload background user
-        [HttpPut("UpdateBackgroundUser")]
-        public async Task<IActionResult> UpdateBackgroundUser([FromBody] BackgroundDTO backgroundDTO)
-        {
-            if (backgroundDTO == null) return BadRequest();
-            await _userService.UploadBackgroundUser(backgroundDTO);
-            return Ok("Update background user success");
-        }
-
-        //Get current logged-in user information
-        [HttpGet("GetCurrentUser")]
-        public async Task<IActionResult> GetCurrentUser()
-        {
-            var userId = User.FindFirst(ClaimTypes.Name)?.Value;
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized("User not authenticated.");
-
-            var user = await _userService.GetUserByIdAsync(userId);
-            if (user == null)
-                return NotFound("User not found.");
-
-            return Ok(user);
-        }
-
-        // Forgot Passsword
-        [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
-        {
-            // Check if email is not exist in database
-            if (!await _userService.CheckexistEmail(request.Email))
-            {
-                return BadRequest("Email not exist");
-            }
-
-            // Create OTP 6 numbers
-            var otp = new Random().Next(100000, 999999).ToString();
-
-            // Save OTP 5 minutes
-            _otpStore[request.Email] = (otp, DateTime.UtcNow.AddMinutes(5));
-
-            // Send OTP to Email
-            await _emailService.SendOtpAsync(request.Email, otp);
-
-            return Ok("OTP was send to email");
-        }
-
-        // Reset password
-        [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
-        {
-            // If email don't exist in OTP store, it means forgot password request not sent
-            if (!_otpStore.ContainsKey(request.Email))
-                return BadRequest("Chưa gửi yêu cầu quên mật khẩu");
-
-            var (otp, expiry) = _otpStore[request.Email];
-
-            // Check if OTP is valid and not expired
-            if (otp != request.Otp || DateTime.UtcNow > expiry)
-                return BadRequest("OTP is not valid or not expired");
-
-            if (request.NewPassword != request.ConfirmPassword)
-                return BadRequest("New password and confirm new password do not match");
-
-            var user = await _userService.GetUserByEmailAsync(request.Email);
-            if (user == null) return BadRequest("User not exist");
-
-            // Hash new password by BCrypt
-            user.Password = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
-            await _userService.UpdateUserAsync(user);
-
-            // Delete OTP after successful reset
-            _otpStore.Remove(request.Email);
-
-            return Ok("Reset password successful");
-        }
     }
 }

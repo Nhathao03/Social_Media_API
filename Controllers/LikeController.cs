@@ -23,7 +23,10 @@ namespace Social_Media.Controllers
         [HttpPost("AddLike")]
         public async Task<IActionResult> AddLike([FromBody] LikeDTO likeDTO)
         {
-            if (likeDTO == null ) return BadRequest();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
             // Check userID and postID
             var existingLike = await _likeService.CheckLikeUserOnPost(likeDTO.UserID, likeDTO.postID);

@@ -21,7 +21,10 @@ namespace Social_Media.Controllers
         [HttpPost("addAddress")]
         public async Task<IActionResult> addAddress([FromBody] AddressDTO addressDTO)
         {
-            if (addressDTO == null) return BadRequest();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             await _addressService.AddAddressAsync(addressDTO);
             return Ok("add success !");
         }
@@ -51,7 +54,10 @@ namespace Social_Media.Controllers
         [HttpPut("updateAddress")]
         public async Task<IActionResult> updateAddress([FromBody] Address address)
         {
-            if (address == null) return BadRequest();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             await _addressService.UpdateAddressAsync(address);
             return Ok("Update address success");
         }

@@ -36,6 +36,12 @@ namespace Social_Media.Models
         public List<Following> following { get; set; }
         public string? gender { get; set; }
         public int? addressID { get; set; }
+        public string NormalizeUsername { get; set; }
+        public string NormalizeEmail { get; set; }
         public Address? address { get; set; }
+
+        public ICollection<Post>? posts { get; set; }
+        public ICollection<Comment>? Comments { get; set; }
+        public ICollection<Like>? Likes { get; set; }
     }
 }

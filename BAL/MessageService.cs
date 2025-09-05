@@ -47,9 +47,14 @@ namespace Social_Media.BAL
             await _MessageRepository.DeleteMessage(id);
         } 
 
-        public async Task<List<Message>> GetMessageByReceiverIDAsync(string ReceiverID, string SenderID)
+        public async Task<List<Message>> GetMessageByReceiverIdAndSenderIdAsync(string userId1, string userId2)
         {
-            return await _MessageRepository.GetMessageByReceiverID(ReceiverID, SenderID);
+            return await _MessageRepository.GetMessageByReceiverIdAndSenderId(userId1, userId2);
+        }
+
+        public async Task<List<Message>> GetMessageLastestAsync(string userId1, string userId2)
+        {
+            return await _MessageRepository.GetMessageLastest(userId1, userId2);
         }
     }
 }

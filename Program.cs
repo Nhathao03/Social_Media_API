@@ -27,8 +27,8 @@ namespace Social_Media
                         ValidateIssuer = true,
                         ValidateAudience = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = jwtSettings["Issuer"], // API phát hành token
-                        ValidAudience = jwtSettings["Audience"], // Frontend s? d?ng token
+                        ValidIssuer = jwtSettings["Issuer"], // API issue token
+                        ValidAudience = jwtSettings["Audience"], // Frontend use token
                         IssuerSigningKey = new SymmetricSecurityKey(key)
                     };
                 });

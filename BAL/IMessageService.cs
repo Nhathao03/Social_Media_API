@@ -10,6 +10,7 @@ namespace Social_Media.BAL
         Task AddMessageAsync(MessageDTO messageDTO);
         Task UpdateMessageAsync(Message Message);
         Task DeleteMessageAsync(int id);
-        Task<List<Message>> GetMessageByReceiverIDAsync(string ReceiverID, string SenderID);
+        Task<List<Message>> GetMessageByReceiverIdAndSenderIdAsync(string userId1, string userId2);
+        Task<List<Message>> GetMessageLastestAsync(string userId1, string userId2);
     }
 }

@@ -45,11 +45,18 @@ namespace Social_Media.DAL
             }
         }
 
-        public async Task<List<Message>> GetMessageByReceiverID (string ReceiverID, string SenderID)
+        public async Task<List<Message>> GetMessageByReceiverIdAndSenderId (string userId1, string userId2)
         {
-            return await _context.messages.Where(m => (m.ReceiverId == ReceiverID && m.SenderId == SenderID) 
-                                                || (m.ReceiverId == SenderID && m.SenderId == ReceiverID))
+            return await _context.messages.Where(m => (m.ReceiverId == userId1 && m.SenderId == userId2) 
+                                                || (m.ReceiverId == userId2 && m.SenderId == userId1))
                                                 .OrderBy(m => m.CreatedAt).ToListAsync();
+        }
+
+        public async Task<List<Message>> GetMessageLastest ( string userId1, string userId2)
+        {
+            return await _context.messages.Where(m => (m.ReceiverId == userId1 && m.SenderId == userId2)
+                                                           || (m.ReceiverId == userId2 && m.SenderId == userId1))
+                                                .OrderByDescending(m => m.CreatedAt).Take(1).ToListAsync();
         }
 
     }
