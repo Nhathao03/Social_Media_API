@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Social_Media.Models.DTO.Comment;
 
 namespace Social_Media.Models.DTO
 {

@@ -12,9 +12,9 @@ namespace Social_Media.BAL
 {
     public class UserLoginService : IUserLoginService
     {
-        private readonly UserLoginRepository _userLoginRepository;
+        private readonly IUserLoginRepository _userLoginRepository;
 
-        public UserLoginService(UserLoginRepository repository)
+        public UserLoginService(IUserLoginRepository repository)
         {
             _userLoginRepository = repository;
         }

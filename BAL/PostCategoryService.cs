@@ -5,9 +5,9 @@ namespace Social_Media.BAL
 {
     public class PostCategoryService : IPostCategoryService
     {
-        private readonly PostCategoryRepository _repository;
+        private readonly IPostCategoryRepository _repository;
 
-        public PostCategoryService(PostCategoryRepository repository)
+        public PostCategoryService(IPostCategoryRepository repository)
         {
             _repository = repository;
         }

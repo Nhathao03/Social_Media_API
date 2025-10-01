@@ -1,5 +1,4 @@
 ﻿using Social_Media.Models;
-using Social_Media.Models.DTO;
 using Social_Media.Models.DTO.AccountUser;
 
 namespace Social_Media.DAL
@@ -10,10 +9,10 @@ namespace Social_Media.DAL
         Task<User> GetUserById(string id);
         Task UpdateUser(User user);
         Task DeleteUser(string id);
-        Task RegisterAccount(User user);
-        Task<List<User>> FindUser(string stringData, string CurrentUserIdSearch);
+        Task<User> RegisterAccount(User user);
         Task<bool> IsEmailExistsAsync(string email);
         Task<bool> IsPhoneExistsAsync(string phoneNumber);
         Task<User> GetUserByEmail(string email);
+        Task<bool> CheckPasswordSignInAsync(LoginDTO model, string password);
     }
 }

@@ -8,11 +8,11 @@ namespace Social_Media.BAL
         Task<IEnumerable<Friends>> GetAllFriendsAsync();
         Task<Friends> GetFriendsByIdAsync(int id);
         Task AddFriendsAsync(int id);
-        Task UpdateFriendsAsync(Friends Friends);
+        Task UpdateFriendsAsync(FriendDTO Friends);
         Task DeleteFriendsAsync(int id);
-        Task<List<Friends>> GetFriendsByUserIDAsync(string userID);
-        Task<List<Friends>> getFriendRecentlyAdded(string  userID);
-        Task<List<string>> getFriendOfEachUser(string userId);
-        Task<List<Friends>> GetFriendBaseOnHomeTown(string userId);
+        Task<IEnumerable<Friends>> GetFriendsByUserIDAsync(string userID);
+        Task<IEnumerable<Friends>> getFriendRecentlyAdded(string  userID);
+        Task<IEnumerable<string>> getFriendOfEachUser(string userId);
+        Task<IEnumerable<Friends>> GetFriendBaseOnHomeTown(string userId);
     }
 }

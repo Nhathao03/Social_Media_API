@@ -8,9 +8,9 @@ namespace Social_Media.BAL
 {
     public class FriendRequestService : IFriendRequestService
     {
-        private readonly FriendRequestRepository _FriendRequestRepository;
+        private readonly IFriendRequestRepository _FriendRequestRepository;
 
-        public FriendRequestService(FriendRequestRepository repository)
+        public FriendRequestService(IFriendRequestRepository repository)
         {
             _FriendRequestRepository = repository;
         }
@@ -36,8 +36,15 @@ namespace Social_Media.BAL
             await _FriendRequestRepository.AddFriendRequest(request);
         }
 
-        public async Task UpdateFriendRequestAsync(FriendRequest FriendRequest)
+        public async Task UpdateFriendRequestAsync(FriendRequestDTO modelDTO)
         {
+            var FriendRequest = await _FriendRequestRepository.GetFriendRequestById(modelDTO.Id);
+            if (FriendRequest == null)
+            {
+                throw new KeyNotFoundException($"Friend request with ID {modelDTO.Id} not found.");
+            }
+            FriendRequest.SenderID = modelDTO.SenderID;
+            FriendRequest.ReceiverID = modelDTO.ReceiverID;
             await _FriendRequestRepository.UpdateFriendRequest(FriendRequest);
         }
 
@@ -45,12 +52,12 @@ namespace Social_Media.BAL
         {
             await _FriendRequestRepository.DeleteFriendRequest(id);
         }
-        public async Task<List<FriendRequest>> GetFriendRequestByReceiverID(string id)
+        public async Task<IEnumerable<FriendRequest>> GetFriendRequestByReceiverID(string id)
         {
             return await _FriendRequestRepository.GetFriendRequestByReceiverID(id);
         }
 
-        public async Task<List<FriendRequest>> GetFriendRequestByUserID(string id)
+        public async Task<IEnumerable<FriendRequest>> GetFriendRequestByUserID(string id)
         {
             return await _FriendRequestRepository.GetFriendRequestByUserID(id);
         }

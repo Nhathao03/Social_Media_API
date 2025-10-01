@@ -7,11 +7,11 @@ namespace Social_Media.BAL
     {
         Task<IEnumerable<FriendRequest>> GetAllFriendRequestAsync();
         Task<FriendRequest> GetFriendRequestByIdAsync(int id);
-        Task UpdateFriendRequestAsync(FriendRequest FriendRequest);
+        Task UpdateFriendRequestAsync(FriendRequestDTO FriendRequest);
         Task DeleteFriendRequestAsync(int id);
         Task AddFriendRequestAsync(FriendRequestDTO FriendRequest);
-        Task<List<FriendRequest>> GetFriendRequestByReceiverID(string id);
-        Task<List<FriendRequest>> GetFriendRequestByUserID(string id);
+        Task<IEnumerable<FriendRequest>> GetFriendRequestByReceiverID(string id);
+        Task<IEnumerable<FriendRequest>> GetFriendRequestByUserID(string id);
         Task ConfirmRequest(int id);
 
     }

@@ -13,15 +13,18 @@ namespace Social_Media.DAL
         public DbSet<PostCategory> post_category { get; set; }
         public DbSet<PostImage> post_image { get; set; }
         public DbSet<User> users { get; set; }
-        public DbSet<UserLogins> usersLogins { get; set; }
-        public DbSet<Role> roles { get; set; }
-        public DbSet<RoleCheck> rolesCheck { get; set; }
+        public DbSet<UserLogins> usersLogins { get; set; } 
         public DbSet<Address> addresses { get; set; }
         public DbSet<Friends> friends { get; set; }
         public DbSet<Type_Friends> type_friends { get; set; }
         public DbSet<Follower> followers { get; set; }
         public DbSet<Following> followings { get; set; }
         public DbSet<FriendRequest> friendRequests { get; set; }
-
+        public DbSet<Report> reports { get; set; }
+        public DbSet<Role> role { get; set; }
+        public DbSet<RoleCheck> roleChecks { get; set; }
+        public DbSet<Notification> notifications { get; set; }
+        public DbSet<CommentReactions> commentReactions { get; set; }
+        public DbSet<CommentReplies> commentReplies { get; set; }
     }
 }

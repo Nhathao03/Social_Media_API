@@ -1,14 +1,15 @@
 ﻿using Social_Media.DAL;
 using Social_Media.Models;
 using Social_Media.Models.DTO;
+using Social_Media.Models.DTO.Role;
 
 namespace Social_Media.BAL
 {
     public class RoleService : IRoleService
     {
-        private readonly RoleRepository _roleRepository;
+        private readonly IRoleRepository _roleRepository;
 
-        public RoleService(RoleRepository repository)
+        public RoleService(IRoleRepository repository)
         {
             _roleRepository = repository;
         }
@@ -18,24 +19,51 @@ namespace Social_Media.BAL
             return await _roleRepository.GetAllRole();
         }
 
-        public async Task<Role> GetRoleByIdAsync(int id)
+        public async Task<Role> GetRoleByIdAsync(string id)
         {
             return await _roleRepository.GetRoleById(id);
         }
 
-        public async Task AddRoleAsync(Role role)
+        public async Task AddRoleAsync(string RoleName)
         {
-            await _roleRepository.AddRole(role);
+            var modelData = new Role
+            {
+                // call to function generate roleId to create new roleId
+                Id = GenerateRoleId(),
+                Name = RoleName
+            };
+            await _roleRepository.AddRole(modelData);
         }
 
-        public async Task UpdateRoleAsync(Role role)
+        // Generate roleId 
+        private string GenerateRoleId()
         {
-            await _roleRepository.UpdateRole(role);
+            var random = new Random();
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, 8)
+                             .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public async Task UpdateRoleAsync(RoleDTO modelDTO)
+        {
+            var existingRole = await _roleRepository.GetRoleById(modelDTO.Id);
+            if(existingRole == null)
+            {
+                throw new KeyNotFoundException($"Role with Id {modelDTO.Id} not exits.");
+            }
+
+            existingRole.Name = modelDTO.Name;
+
+            await _roleRepository.UpdateRole(existingRole);
         }
 
         public async Task DeleteRoleAsync(int id)
         {
             await _roleRepository.DeleteRole(id);
-        } 
+        }
+        public async Task<string> GetRoleIdUserAsync()
+        {
+            return await _roleRepository.GetRoleIdUser();
+        }
     }
 }

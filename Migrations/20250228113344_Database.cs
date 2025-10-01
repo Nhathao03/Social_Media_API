@@ -41,33 +41,6 @@ namespace Social_Media.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "roles",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_roles", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "rolesCheck",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserID = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RoleID = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_rolesCheck", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "users",
                 columns: table => new
                 {
@@ -229,12 +202,6 @@ namespace Social_Media.Migrations
 
             migrationBuilder.DropTable(
                 name: "post_image");
-
-            migrationBuilder.DropTable(
-                name: "roles");
-
-            migrationBuilder.DropTable(
-                name: "rolesCheck");
 
             migrationBuilder.DropTable(
                 name: "users");

@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Social_Media.BAL;
+using Social_Media.Helpers;
 using Social_Media.Models;
-using Social_Media.Models.DTO;
+using Social_Media.Models.DTO.AccountUser;
+using Social_Media.Models.DTO.RoleCheck;
+using Swashbuckle.AspNetCore.Annotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -28,109 +31,53 @@ namespace Social_Media.Controllers
 
         // Register account
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterAccount([FromBody] RegisterDTO model)
+        [SwaggerOperation(Summary = "Register a new user", Description = "Creates a new user account using email, password.")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> RegisterAccount([FromBody] RegisterDTO? model)
         {
             // check valid model
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            if (model == null || string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
-                return BadRequest("Invalid input data.");
+            if (model == null)
+                return ApiResponseHelper.BadRequest("Model can not null.");
 
-
-            if(await _userService.IsEmailExistsAsync(model.Email))
-                return BadRequest("Email already in use.");
-            if (!string.IsNullOrEmpty(model.PhoneNumber) && await _userService.IsPhoneExistsAsync(model.PhoneNumber))
-                return BadRequest("Phone number already in use.");
-
-            // Hash password before save to db
-            model.Password = BCrypt.Net.BCrypt.HashPassword(model.Password);
-            await _userService.RegisterAccountAsync(model);
-
-            return Ok(new { message = "User registered successfully!" });
+            var result = await _userService.RegisterAccountAsync(model);
+            if (!result.Success)
+                return ApiResponseHelper.BadRequest(string.Join("", "", result.Errors));
+            return ApiResponseHelper.Created(result.Errors, "Register account successfully.");
         }
 
         // Login
         [HttpPost("login")]
-        public async Task<IActionResult> LoginAccount([FromBody] LoginDTO model)
+        [SwaggerOperation(Summary = "User login", Description = "Logs in user with email and password, returns JWT tokens and refresh token.")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> LoginAccount([FromBody] LoginDTO? model)
         {
             // check valid model
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            if (model == null || string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
-                return BadRequest("Invalid input data.");
+            if (model == null)
+                return ApiResponseHelper.BadRequest("Model can not null.");
 
-            // Get user by email
-            var user = await _userService.GetUserByEmailAsync(model.Email);
-            if (user == null)
-                return Unauthorized("Email not found.");
+            var result = await _userService.LoginAsync(model);
 
-            // Equals password
-            if (!BCrypt.Net.BCrypt.Verify(model.Password, user.Password))
-                return Unauthorized("Incorrect password.");
+            if(!result.Success)
+                return ApiResponseHelper.Unauthorized(string.Join("", "", result.Errors));
 
-            // Get user role
-            bool isAdmin = await _roleCheckService.IsAdminAsync(user.Id);
-            string role = isAdmin ? "Admin" : "User";
-
-            // Generate JWT token
-            var token = GenerateJwtToken(user.Id, role);
-
-            // Redirect URL based on user role
-            string redirectURL = isAdmin ? "/admin" : "/home";
-
-            return Ok(new
-            {
-                token,
-                redirectURL,
-            });
-        }
-
-        //Generate JWT Token
-        private string GenerateJwtToken(string userID, string role)
-        {
             var jwtSettings = _config.GetSection("Jwt");
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
-
-            var claims = new List<Claim>
+            Response.Cookies.Append("token", result.AccessToken, new CookieOptions
             {
-                new Claim(ClaimTypes.Name, userID),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Role, role)
-            };
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwtSettings["Expires"]))
+            }); ;
 
-            var token = new JwtSecurityToken(
-                issuer: jwtSettings["Issuer"],
-                audience: jwtSettings["Audience"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwtSettings["Expires"])),
-                signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-        //Refresh JWT Token
-        [HttpPost("refreshToken")]
-        public IActionResult RefreshToken([FromBody] string token)
-        {
-            if (string.IsNullOrEmpty(token))
-                return BadRequest("Token is required.");
-
-            var handler = new JwtSecurityTokenHandler();
-            if (!handler.CanReadToken(token))
-                return BadRequest("Invalid token format.");
-
-            var jwtToken = handler.ReadJwtToken(token);
-            var userId = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
-            var role = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized("User not authenticated.");
-
-            var newToken = GenerateJwtToken(userId, role);
-            return Ok(new { token = newToken });
+            return ApiResponseHelper.Success(new { result.RefreshToken, result.AccessToken }, "Login successfully." );
         }
 
         //Decode JWT Token

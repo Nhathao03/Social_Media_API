@@ -1,14 +1,16 @@
-﻿using Social_Media.DAL;
+﻿using NuGet.Protocol.Core.Types;
+using Social_Media.DAL;
 using Social_Media.Models;
 using Social_Media.Models.DTO;
+using Social_Media.Models.DTO.RoleCheck;
 
 namespace Social_Media.BAL
 {
     public class RoleCheckService : IRoleCheckService
     {
-        private readonly RoleCheckRepository _roleCheckRepository;
+        private readonly IRoleCheckRepository _roleCheckRepository;
 
-        public RoleCheckService(RoleCheckRepository repository)
+        public RoleCheckService(IRoleCheckRepository repository)
         {
             _roleCheckRepository = repository;
         }
@@ -23,21 +25,37 @@ namespace Social_Media.BAL
             return await _roleCheckRepository.GetRoleCheckById(id);
         }
 
-        public async Task AddRoleCheckAsync(RoleCheck roleCheck)
+        public async Task AddRoleCheckAsync(RoleCheckDTO modelDTO)
         {
-            await _roleCheckRepository.AddRoleCheck(roleCheck);
+            var roleCheckEntity = new RoleCheck
+            {
+                Id = modelDTO.Id,
+                UserID = modelDTO.UserId,
+                RoleID = modelDTO.RoleId
+            };
+            await _roleCheckRepository.AddRoleCheck(roleCheckEntity);
         }
 
-        public async Task UpdateRoleCheckAsync(RoleCheck roleCheck)
+        public async Task UpdateRoleCheckAsync(RoleCheckDTO modelDTO)
         {
-            await _roleCheckRepository.UpdateRoleCheck(roleCheck);
+            var existingroleCheck = await _roleCheckRepository.GetRoleCheckById(modelDTO.Id);
+            if (existingroleCheck == null)
+            {
+                throw new KeyNotFoundException($"RoleCheck with Id {modelDTO.Id} not exits.");
+            }
+            existingroleCheck.RoleID = modelDTO.RoleId;
+
+            await _roleCheckRepository.UpdateRoleCheck(existingroleCheck);
         }
 
         public async Task DeleteRoleCheckAsync(int id)
         {
             await _roleCheckRepository.DeleteRoleCheck(id);
         }
-
+        public async Task DeleteRoleCheckByUserIdAsync(string userId)
+        {
+            await _roleCheckRepository.DeleteRoleCheckByUserId(userId);
+        }
         public async Task<bool> IsAdminAsync(string userId)
         {
             return await _roleCheckRepository.IsAdminAsync(userId);

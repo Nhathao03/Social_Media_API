@@ -71,11 +71,70 @@ namespace Social_Media.Migrations
                     b.Property<int>("PostId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Reply")
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("comments");
+                });
+
+            modelBuilder.Entity("Social_Media.Models.CommentReactions", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CommentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReactionType")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Sticker")
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CommentId");
+
+                    b.ToTable("commentReactions");
+                });
+
+            modelBuilder.Entity("Social_Media.Models.CommentReplies", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CommentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Image")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -84,11 +143,11 @@ namespace Social_Media.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("ID");
+                    b.HasKey("Id");
 
-                    b.HasIndex("PostId");
+                    b.HasIndex("CommentId");
 
-                    b.ToTable("comments");
+                    b.ToTable("commentReplies");
                 });
 
             modelBuilder.Entity("Social_Media.Models.Follower", b =>
@@ -216,11 +275,13 @@ namespace Social_Media.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ID");
 
                     b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("likes");
                 });
@@ -253,6 +314,35 @@ namespace Social_Media.Migrations
                     b.ToTable("messages");
                 });
 
+            modelBuilder.Entity("Social_Media.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("notifications");
+                });
+
             modelBuilder.Entity("Social_Media.Models.Post", b =>
                 {
                     b.Property<int>("ID")
@@ -277,7 +367,7 @@ namespace Social_Media.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserID")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("Views")
                         .HasColumnType("int");
@@ -285,6 +375,8 @@ namespace Social_Media.Migrations
                     b.HasKey("ID");
 
                     b.HasIndex("PostCategoryID");
+
+                    b.HasIndex("UserID");
 
                     b.ToTable("posts");
                 });
@@ -327,7 +419,7 @@ namespace Social_Media.Migrations
                     b.ToTable("post_image");
                 });
 
-            modelBuilder.Entity("Social_Media.Models.Role", b =>
+            modelBuilder.Entity("Social_Media.Models.Report", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -335,13 +427,44 @@ namespace Social_Media.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("reports");
+                });
+
+            modelBuilder.Entity("Social_Media.Models.Role", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("roles");
+                    b.ToTable("role");
                 });
 
             modelBuilder.Entity("Social_Media.Models.RoleCheck", b =>
@@ -354,15 +477,19 @@ namespace Social_Media.Migrations
 
                     b.Property<string>("RoleID")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("UserID")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("rolesCheck");
+                    b.HasIndex("RoleID");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("roleChecks");
                 });
 
             modelBuilder.Entity("Social_Media.Models.Type_Friends", b =>
@@ -405,8 +532,7 @@ namespace Social_Media.Migrations
 
                     b.Property<string>("Fullname")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("NormalizeEmail")
                         .IsRequired()
@@ -476,7 +602,37 @@ namespace Social_Media.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Social_Media.Models.User", "user")
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Post");
+
+                    b.Navigation("user");
+                });
+
+            modelBuilder.Entity("Social_Media.Models.CommentReactions", b =>
+                {
+                    b.HasOne("Social_Media.Models.Comment", "Comment")
+                        .WithMany("CommentReactions")
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
+                });
+
+            modelBuilder.Entity("Social_Media.Models.CommentReplies", b =>
+                {
+                    b.HasOne("Social_Media.Models.Comment", "Comment")
+                        .WithMany("CommentReplies")
+                        .HasForeignKey("CommentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
                 });
 
             modelBuilder.Entity("Social_Media.Models.Follower", b =>
@@ -516,7 +672,26 @@ namespace Social_Media.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Social_Media.Models.User", "user")
+                        .WithMany("Likes")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Post");
+
+                    b.Navigation("user");
+                });
+
+            modelBuilder.Entity("Social_Media.Models.Notification", b =>
+                {
+                    b.HasOne("Social_Media.Models.User", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Social_Media.Models.Post", b =>
@@ -527,7 +702,13 @@ namespace Social_Media.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Social_Media.Models.User", "user")
+                        .WithMany("posts")
+                        .HasForeignKey("UserID");
+
                     b.Navigation("PostCategory");
+
+                    b.Navigation("user");
                 });
 
             modelBuilder.Entity("Social_Media.Models.PostImage", b =>
@@ -539,6 +720,44 @@ namespace Social_Media.Migrations
                         .IsRequired();
 
                     b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("Social_Media.Models.Report", b =>
+                {
+                    b.HasOne("Social_Media.Models.Post", "Post")
+                        .WithMany("Reports")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Social_Media.Models.User", "User")
+                        .WithMany("Reports")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Social_Media.Models.RoleCheck", b =>
+                {
+                    b.HasOne("Social_Media.Models.Role", "Role")
+                        .WithMany("RoleChecks")
+                        .HasForeignKey("RoleID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Social_Media.Models.User", "User")
+                        .WithMany("RoleChecks")
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Social_Media.Models.User", b =>
@@ -555,6 +774,13 @@ namespace Social_Media.Migrations
                     b.Navigation("users");
                 });
 
+            modelBuilder.Entity("Social_Media.Models.Comment", b =>
+                {
+                    b.Navigation("CommentReactions");
+
+                    b.Navigation("CommentReplies");
+                });
+
             modelBuilder.Entity("Social_Media.Models.Post", b =>
                 {
                     b.Navigation("Comments");
@@ -562,6 +788,13 @@ namespace Social_Media.Migrations
                     b.Navigation("Likes");
 
                     b.Navigation("PostImages");
+
+                    b.Navigation("Reports");
+                });
+
+            modelBuilder.Entity("Social_Media.Models.Role", b =>
+                {
+                    b.Navigation("RoleChecks");
                 });
 
             modelBuilder.Entity("Social_Media.Models.Type_Friends", b =>
@@ -571,9 +804,21 @@ namespace Social_Media.Migrations
 
             modelBuilder.Entity("Social_Media.Models.User", b =>
                 {
+                    b.Navigation("Comments");
+
+                    b.Navigation("Likes");
+
+                    b.Navigation("Notifications");
+
+                    b.Navigation("Reports");
+
+                    b.Navigation("RoleChecks");
+
                     b.Navigation("follower");
 
                     b.Navigation("following");
+
+                    b.Navigation("posts");
                 });
 #pragma warning restore 612, 618
         }

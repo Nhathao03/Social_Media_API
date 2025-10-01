@@ -39,10 +39,11 @@ namespace Social_Media.DAL
             }
         }
 
-        public async Task AddNewAddress(Address address)
+        public async Task<int> AddNewAddress(Address address)
         {
-            _context.AddAsync(address);
+            var data = _context.addresses.Add(address);
             await _context.SaveChangesAsync();
+            return data.Entity.ID;
         }
     }
 }

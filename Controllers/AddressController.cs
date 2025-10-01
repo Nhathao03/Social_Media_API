@@ -25,8 +25,8 @@ namespace Social_Media.Controllers
             {
                 return BadRequest(ModelState);
             }
-            await _addressService.AddAddressAsync(addressDTO);
-            return Ok("add success !");
+            var newId = await _addressService.AddAddressAsync(addressDTO);
+            return Ok(new { Message = "Add new address success", AddressId = newId });
         }
 
         //Get all addresses
@@ -52,7 +52,7 @@ namespace Social_Media.Controllers
         //Update address by ID (Admin only)
         [Authorize(Roles = "Admin")]
         [HttpPut("updateAddress")]
-        public async Task<IActionResult> updateAddress([FromBody] Address address)
+        public async Task<IActionResult> updateAddress([FromBody] AddressDTO address)
         {
             if (!ModelState.IsValid)
             {

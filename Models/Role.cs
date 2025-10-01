@@ -5,7 +5,10 @@ namespace Social_Media.Models
     public class Role
     {
         [Key]
-        public int Id { get; set; }
-        public string Name { get; set; }    
+        public string Id { get; set; }
+        public string Name { get; set; } = null!;
+
+        // Relationship
+        public ICollection<RoleCheck>? RoleChecks { get; set; }
     }
 }

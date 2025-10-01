@@ -51,15 +51,6 @@ namespace Social_Media.Controllers
             return Ok(getUser);
         }
 
-        //Find user by string data (email or phone number)
-        [HttpGet("findUser/{stringData}/{CurrentUserIdSearch}")]
-        public async Task<IActionResult> FindUser(string stringData, string CurrentUserIdSearch)
-        {
-            var user = await _userService.FindUserAsync(stringData, CurrentUserIdSearch);
-            if (user == null) return NotFound();
-            return Ok(user);
-        }
-
         //Update personal information user
         [HttpPut("UpdatePersonalInformation")]
         public async Task<IActionResult> UpdatePersonalInformation([FromBody] PersonalInformationDTO personalInformationDTO)
@@ -181,6 +172,19 @@ namespace Social_Media.Controllers
             _otpStore.Remove(request.Email);
 
             return Ok("Reset password successful");
+        }
+
+        //Delete user by ID (Admin only)
+        [HttpDelete("DeleteUserById/{userID}")]
+        public async Task<IActionResult> DeleteUserById(string userID)
+        {
+            // check null or empty
+            if (string.IsNullOrEmpty(userID))
+            {
+                return BadRequest("UserID is required.");
+            }
+            await _userService.DeleteUserAsync(userID);
+            return NoContent();
         }
     }
 }

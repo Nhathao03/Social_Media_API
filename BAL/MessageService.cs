@@ -7,9 +7,9 @@ namespace Social_Media.BAL
 {
     public class MessageService : IMessageService
     {
-        private readonly MessageRepository _MessageRepository;
+        private readonly IMessageRepository _MessageRepository;
 
-        public MessageService(MessageRepository repository)
+        public MessageService(IMessageRepository repository)
         {
             _MessageRepository = repository;
         }

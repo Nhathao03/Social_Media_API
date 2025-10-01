@@ -10,7 +10,7 @@ namespace Social_Media.DAL
         Task AddFriendRequest(FriendRequest FriendRequest);
         Task UpdateFriendRequest(FriendRequest FriendRequest);
         Task DeleteFriendRequest(int id);
-        Task<List<FriendRequest>> GetFriendRequestByReceiverID(string id);
-        Task<List<FriendRequest>> GetFriendRequestByUserID(string id);
+        Task<IEnumerable<FriendRequest>> GetFriendRequestByReceiverID(string id);
+        Task<IEnumerable<FriendRequest>> GetFriendRequestByUserID(string id);
     }
 }
