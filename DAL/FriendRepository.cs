@@ -45,12 +45,12 @@ namespace Social_Media.DAL
                 await _context.SaveChangesAsync();
             }
         }
-        public async Task<List<Friends>> GetFriendsByUserID( string userID)
+        public async Task<IEnumerable<Friends>> GetFriendsByUserID( string userID)
         {
             return await _context.friends.Where(f => f.UserID == userID).ToListAsync();
         }
 
-        public async Task<List<Friends>> getFriendRecentlyAdded(string userID)
+        public async Task<IEnumerable<Friends>> getFriendRecentlyAdded(string userID)
         {
             var threeDaysAgo = DateTime.UtcNow.AddDays(-3);
             return await _context.friends
@@ -59,7 +59,7 @@ namespace Social_Media.DAL
                 .ToListAsync();
         }
 
-        public async Task<List<string>> GetFriendOfEachUser(string userID)
+        public async Task<IEnumerable<string>> GetFriendOfEachUser(string userID)
         {
             return await _context.friends
                 .Where(f => f.UserID == userID || f.FriendID == userID)
@@ -68,7 +68,7 @@ namespace Social_Media.DAL
                 .ToListAsync();
         }
 
-        public async Task<List<Friends>> GetFriendBaseOnHomeTown(string userId)
+        public async Task<IEnumerable<Friends>> GetFriendBaseOnHomeTown(string userId)
         {
             var currentUser = await _context.users.FirstOrDefaultAsync(u => u.Id == userId);
             if (currentUser == null) return null;

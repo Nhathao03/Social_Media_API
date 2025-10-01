@@ -6,9 +6,9 @@ namespace Social_Media.BAL
 {
     public class TypeFriendsService : ITypeFriendsService
     {
-        private readonly TypeFriendsRepository _TypeFriendsRepository;
+        private readonly ITypeFriendsRepository _TypeFriendsRepository;
 
-        public TypeFriendsService(TypeFriendsRepository repository)
+        public TypeFriendsService(ITypeFriendsRepository repository)
         {
             _TypeFriendsRepository = repository;
         }
@@ -25,7 +25,11 @@ namespace Social_Media.BAL
 
         public async Task AddTypeFriendsAsync(TypeFriendsDTO TypeFriends)
         {
-            await _TypeFriendsRepository.AddTypeFriends(TypeFriends);
+            var data = new Type_Friends
+            {
+                Type = TypeFriends.Name
+            };
+            await _TypeFriendsRepository.AddTypeFriends(data);
         }
 
         public async Task UpdateTypeFriendsAsync(Type_Friends TypeFriends)

@@ -6,9 +6,9 @@ namespace Social_Media.BAL
 {
     public class AddressService : IAddressService
     {
-        private readonly AddressRepository _repository;
+        private readonly IAddressRepository _repository;
 
-        public AddressService(AddressRepository repository)
+        public AddressService(IAddressRepository repository)
         {
             _repository = repository;
         }
@@ -23,25 +23,43 @@ namespace Social_Media.BAL
             return await _repository.GetAddressById(id);
         }
 
-        public async Task UpdateAddressAsync(Address Address)
+        public async Task UpdateAddressAsync(AddressDTO modelDTO)
         {
-            await _repository.UpdateAddress(Address);
+            var existingAddress = await _repository.GetAddressById(modelDTO.Id);
+            if (existingAddress == null)
+            {
+                throw new KeyNotFoundException($"Address with Id {modelDTO.Id} not exits.");
+            }
+            existingAddress.name = modelDTO.name;
+            existingAddress.slug = modelDTO.slug;
+            existingAddress.type = modelDTO.type;
+            existingAddress.name_with_type = modelDTO.name_with_type;
+
+            await _repository.UpdateAddress(existingAddress);
         }
+
 
         public async Task DeleteAddressAsync(int id)
         {
             await _repository.DeleteAddress(id);
         }
-        public async Task AddAddressAsync(AddressDTO addressDTO)
+        public async Task<int> AddAddressAsync(AddressDTO addressDTO)
         {
+            if(addressDTO == null)
+                throw new ArgumentNullException(nameof(addressDTO), "Address data is required.");
+            if(string.IsNullOrWhiteSpace(addressDTO.name))
+                throw new ArgumentException("Address name cannot be empty.", nameof(addressDTO.name));
+
             var address = new Address
             {
-                name = addressDTO.name,
                 slug = addressDTO.slug,
+                name = addressDTO.name,
                 type = addressDTO.type,
-                name_with_type = addressDTO.name_with_type,
+                name_with_type = addressDTO.name_with_type
             };
-            await _repository.AddNewAddress(address);
+
+            var newId = await _repository.AddNewAddress(address);
+            return newId;
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Social_Media.Models;
-using Social_Media.Models.DTO;
 using Social_Media.Models.DTO.AccountUser;
 using System.Text;
 
@@ -46,83 +45,12 @@ namespace Social_Media.DAL
         }
 
         //Register account
-        public async Task RegisterAccount(User user)
+        public async Task<User> RegisterAccount(User user)
         {
             _context.AddAsync(user);
             await _context.SaveChangesAsync();
-        }
-
-        //Find user by username || phonenumber || email
-        public async Task<List<User>> FindUser(string stringData, string CurrentUserIdSearch)
-        {
-            if (string.IsNullOrWhiteSpace(stringData))
-                return new List<User>();
-
-            IQueryable<User> query = _context.users
-                .Include(u => u.follower)
-                .Include(u => u.following);
-
-            if (stringData.Contains("@"))
-            {
-                query = query.Where(u => u.Email.ToLower() == stringData.ToLower());
-            }
-            else if (stringData.All(char.IsDigit))
-            {
-                var normalizedPhone = new string(stringData.Where(char.IsDigit).ToArray());
-                query = query.Where(u => u.PhoneNumber == normalizedPhone);
-            }
-            else
-            {
-                var allMatches = await query
-                    .Select(u => new
-                    {
-                        u.Id,
-                        u.Fullname,
-                        u.NormalizeUsername,
-                        u.Email,
-                        u.PhoneNumber,
-                        u.Avatar,
-                        u.follower,
-                        u.following
-                    })
-                    .ToListAsync();
-
-                var result = allMatches
-                    .Where(u => u.NormalizeUsername.Contains(stringData) && u.Id != CurrentUserIdSearch)
-                    .OrderByDescending(u => u.follower.Count + u.following.Count)
-                    .Select(u => new User
-                    {
-                        Id = u.Id,
-                        Fullname = u.Fullname,
-                        Email = u.Email,
-                        PhoneNumber = u.PhoneNumber,
-                        Avatar = u.Avatar,
-                        follower = u.follower,
-                        following = u.following
-                    })
-                    .ToList();
-
-                return result;
-            }
-
-            var dbResult = await query
-                .OrderByDescending(u => u.follower.Count + u.following.Count)
-                .Select(u => new User
-                {
-                    Id = u.Id,
-                    Fullname = u.Fullname,
-                    Email = u.Email,
-                    PhoneNumber = u.PhoneNumber,
-                    Avatar = u.Avatar,
-                    follower = u.follower,
-                    following = u.following
-                })
-                .ToListAsync();
-
-            return dbResult;
-        }
-
-
+            return user;
+        }        
 
         // Check exist email
         public async Task<bool> IsEmailExistsAsync(string email)
@@ -143,6 +71,17 @@ namespace Social_Media.DAL
                 return true; // Phone number already exists
             }
             return false; // Phone number does not exist
+        }
+
+        // Check password sign in
+        public async Task<bool> CheckPasswordSignInAsync(LoginDTO model, string password)
+        {
+            var user = await _context.users.FirstOrDefaultAsync(u => u.Email == model.Email);
+            if (user != null && BCrypt.Net.BCrypt.Verify(password, user.Password))
+            {
+                return true; // Password is correct
+            }
+            return false; // Password is incorrect
         }
 
     }

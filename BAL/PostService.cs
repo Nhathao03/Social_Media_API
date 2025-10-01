@@ -6,10 +6,10 @@ namespace Social_Media.BAL
 {
     public class PostService : IPostService
     {
-        private readonly PostRepository _repository;
+        private readonly IPostRepository _repository;
         private readonly ILogger<PostService> _logger;
 
-        public PostService(PostRepository repository
+        public PostService(IPostRepository repository
             , ILogger<PostService> logger)
         {
             _repository = repository;

@@ -72,12 +72,12 @@ namespace Social_Media.Controllers
             var commentData = await _commentService.GetCommentByIdAsync(id);
             if (commentData == null) return NotFound("Comment not found.");
 
-            commentData.Sticker += 1;
-
-            await _commentService.UpdateCommentAsync(commentData);
+            //await _commentService.UpdateCommentAsync(dataUpdate);
 
             return NoContent();
         }
+
+        // add like to comment by comment ID and user ID
 
         //Get all likes by post ID
         [HttpGet("GetLikesByPostID/{postID}")]

@@ -2,25 +2,39 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualBasic;
 using Social_Media.DAL;
+using Social_Media.Helpers;
 using Social_Media.Models;
-using Social_Media.Models.DTO;
 using Social_Media.Models.DTO.AccountUser;
+using Social_Media.Models.DTO.RoleCheck;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
+using static Org.BouncyCastle.Math.EC.ECCurve;
 
 namespace Social_Media.BAL
 {
     public class UserService : IUserService
     {
-        private readonly UserRepository _userRepository;
-        private readonly RoleCheckRepository _roleCheckRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IRoleService _roleService;
+        private readonly ILogger<UserService> _logger;
+        private readonly IConfiguration _config;
+        private readonly IRoleCheckService _roleCheckService;
 
-        public UserService(UserRepository repository,
-            RoleCheckRepository roleCheckRepository)
+        public UserService(IUserRepository repository,
+            IRoleService roleService,
+            ILogger<UserService> logger,
+            IConfiguration config,
+            IRoleCheckService roleCheckService)
         {
             _userRepository = repository;
-            _roleCheckRepository = roleCheckRepository;
+            _roleService = roleService;
+            _logger = logger;
+            _config = config;
+            _roleCheckService = roleCheckService;
         }
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()
@@ -45,6 +59,7 @@ namespace Social_Media.BAL
         public async Task DeleteUserAsync(string id)
         {
             await _userRepository.DeleteUser(id);
+            await _roleCheckService.DeleteRoleCheckByUserIdAsync(id);
         }
 
         //Generate userID
@@ -56,29 +71,70 @@ namespace Social_Media.BAL
         }
 
         //Register account
-        public async Task RegisterAccountAsync(RegisterDTO registerDTO)
+        public async Task<AuthResultDTO> RegisterAccountAsync(RegisterDTO model)
         {
+            _logger.LogInformation("Registering new user with email: {Email}", model.Email);
+
+            var emailExists = await _userRepository.IsEmailExistsAsync(model.Email);
+            if(emailExists)
+            {
+                _logger.LogWarning("Registeration failed: Email {Email} already in use.", model.Email);
+                return new AuthResultDTO
+                {
+                    Success = false,
+                    Errors = new[] { "Email already in use." }
+                };
+            }
+
+            if (!string.IsNullOrEmpty(model.PhoneNumber) && await _userRepository.IsPhoneExistsAsync(model.PhoneNumber))
+            {
+                _logger.LogInformation("Registeration failed: Phone number {PhoneNumber} already in use.", model.PhoneNumber);
+                return new AuthResultDTO
+                {
+                    Success = false,
+                    Errors = new[] { "Phone number already in use." }
+                };
+            }
+
             var user = new User
             {
                 Id = GenerateUserID(),
-                Email = registerDTO.Email,
-                Password = registerDTO.Password,
-                PhoneNumber = registerDTO.PhoneNumber,
-                Fullname = registerDTO.FullName,
-                Birth = registerDTO.Birth,
+                Email = model.Email,
+                Password = BCrypt.Net.BCrypt.HashPassword(model.Password),
+                PhoneNumber = model.PhoneNumber,
+                Fullname = model.FullName,
+                Birth = model.Birth,
                 gender = null,
                 Avatar = "user/avatar/avatar_user.png",
                 BackgroundProfile = "user/background/1.jpg",
-                NormalizeEmail = NormalizeString(registerDTO.Email),
-                NormalizeUsername = NormalizeString(registerDTO.FullName),
+                NormalizeEmail = NormalizeString(model.Email),
+                NormalizeUsername = NormalizeString(model.FullName),
             };
-            await _userRepository.RegisterAccount(user);
-            var roleUser = new RoleCheck
+            var result =  await _userRepository.RegisterAccount(user);
+
+            if(result == null)
             {
-                UserID = user.Id,
-                RoleID = "1",
+                _logger.LogError("Registeration failed for email: {Email}", model.Email);
+                return new AuthResultDTO
+                {
+                    Success = false,
+                    Errors = new[] { "Error while registering." }
+                };
+            }
+
+            //Get id role user
+            var roleId = await _roleService.GetRoleIdUserAsync();
+            var roleUser = new RoleCheckDTO
+            {
+                UserId = user.Id,
+                RoleId = roleId,
             };
-            await _roleCheckRepository.AddRoleCheck(roleUser);
+            await _roleCheckService.AddRoleCheckAsync(roleUser);
+
+           return new AuthResultDTO
+           {
+               Success = true
+           };
         }
 
         // Normalize string by removing diacritics and converting to lowercase
@@ -98,13 +154,6 @@ namespace Social_Media.BAL
                 }
             }
             return sb.ToString().Normalize(System.Text.NormalizationForm.FormC);
-        }
-
-        //Find user by username || phonenumber || email
-        public async Task<List<User>> FindUserAsync(string stringData, string CurrentUserIdSearch)
-        {
-            string normalizedData = NormalizeString(stringData);
-            return await _userRepository.FindUser(normalizedData, CurrentUserIdSearch);
         }
 
         //Update information user
@@ -163,6 +212,72 @@ namespace Social_Media.BAL
         public async Task<bool> IsPhoneExistsAsync(string phoneNumber)
         {
             return await _userRepository.IsPhoneExistsAsync(phoneNumber);
+        }
+
+        public async Task<AuthResultDTO> LoginAsync(LoginDTO model)
+        {
+            _logger.LogInformation("Attempting login for email: {Email}", model.Email);
+            var user = await _userRepository.GetUserByEmail(model.Email);
+            if (user == null)
+            {
+                return new AuthResultDTO
+                {
+                    Success = false,
+                    Errors = new[] { "Invalid credentials." }
+                };
+            }
+
+            var result = await _userRepository.CheckPasswordSignInAsync(model, model.Password);
+            if(!result)
+            {
+                _logger.LogWarning("Login failed for email: {Email} due to invalid password.", model.Email);
+                return new AuthResultDTO
+                {
+                    Success = false,
+                    Errors = new[] { "Invalid credentials." }
+                };
+            }
+
+            bool isAdmin = await _roleCheckService.IsAdminAsync(user.Id);
+            string role = isAdmin ? "Admin" : "User";
+
+            // Generate JWT token
+            var accessToken = await GenerateJwtToken(user.Id, role);
+            //string refreshToken = await RefreshToken
+
+            _logger.LogInformation("Login successful for email: {Email}", model.Email);
+            return new AuthResultDTO
+            {
+                Success = true,
+                AccessToken = accessToken,
+                //RefreshToken = refreshToken
+            };
+
+
+        }
+
+        //Generate JWT Token
+        private async Task<string> GenerateJwtToken(string userID, string role)
+        {
+            var jwtSettings = _config.GetSection("Jwt");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, userID),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.Role, role)
+            };
+
+            var token = new JwtSecurityToken(
+                issuer: jwtSettings["Issuer"],
+                audience: jwtSettings["Audience"],
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(jwtSettings["Expires"])),
+                signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
+            );
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
+            return accessToken;
         }
     }
 }

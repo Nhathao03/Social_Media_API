@@ -336,7 +336,7 @@ namespace Social_Media.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("rolesCheck");
+                    b.ToTable("roleChecks");
                 });
 
             modelBuilder.Entity("Social_Media.Models.Type_Friends", b =>

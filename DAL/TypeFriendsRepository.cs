@@ -39,14 +39,9 @@ namespace Social_Media.DAL
             }
         }
 
-        public async Task AddTypeFriends (TypeFriendsDTO typeFriendsDTO)
+        public async Task AddTypeFriends (Type_Friends model)
         {
-            var type_Friends = new Type_Friends
-            {
-                Type = typeFriendsDTO.Name,
-            };
-
-            _context.Add(type_Friends);
+            _context.Add(model);
             await _context.SaveChangesAsync();
         }
 

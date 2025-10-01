@@ -7,7 +7,7 @@ namespace Social_Media.DAL
     {
         Task<IEnumerable<Type_Friends>> GetAllTypeFriends();
         Task<Type_Friends> GetTypeFriendsById(int id);
-        Task AddTypeFriends(TypeFriendsDTO TypeFriends);
+        Task AddTypeFriends(Type_Friends TypeFriends);
         Task UpdateTypeFriends(Type_Friends TypeFriends);
         Task DeleteTypeFriends(int id);
     }

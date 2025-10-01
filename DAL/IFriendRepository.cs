@@ -10,9 +10,9 @@ namespace Social_Media.DAL
         Task AddFriend(Friends friends);
         Task UpdateFriend(Friends friends);
         Task DeleteFriend(int id);
-        Task<List<Friends>> GetFriendsByUserID(string userId);
-        Task<List<Friends>> getFriendRecentlyAdded(string userId);
-        Task<List<string>> GetFriendOfEachUser(string userId);
-        Task<List<Friends>> GetFriendBaseOnHomeTown(string userId);    
+        Task<IEnumerable<Friends>> GetFriendsByUserID(string userId);
+        Task<IEnumerable<Friends>> getFriendRecentlyAdded(string userId);
+        Task<IEnumerable<string>> GetFriendOfEachUser(string userId);
+        Task<IEnumerable<Friends>> GetFriendBaseOnHomeTown(string userId);    
     }
 }

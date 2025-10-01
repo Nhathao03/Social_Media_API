@@ -28,10 +28,11 @@ namespace Social_Media.DAL
             return await _context.comments.Where(c => c.PostId == postID).ToListAsync();
         }
 
-        public async Task AddComment(Comment comment)
+        public async Task<int> AddComment(Comment comment)
         {
-            _context.AddAsync(comment);
+            var data = _context.comments.Add(comment);
             await _context.SaveChangesAsync();
+            return data.Entity.ID;  
         }
 
         public async Task UpdateComment(Comment comment)

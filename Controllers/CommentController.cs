@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Hosting;
 using Social_Media.BAL;
 using Social_Media.Models;
-using Social_Media.Models.DTO;
+using Social_Media.Models.DTO.Comment;
 
 namespace Social_Media.Controllers
 {
@@ -69,13 +69,13 @@ namespace Social_Media.Controllers
 
         //Update comment by ID
         [HttpPut("updateComment")]
-        public async Task<IActionResult> updateComment([FromBody] Comment comment)
+        public async Task<IActionResult> updateComment([FromBody] CommentDTO modelDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            await _commentService.UpdateCommentAsync(comment);
+            await _commentService.UpdateCommentAsync(modelDTO);
             return Ok("Update comment success");
         } 
     }

@@ -7,8 +7,8 @@ namespace Social_Media.BAL
     {
         Task<IEnumerable<Address>> GetAllAddressAsync();
         Task<Address> GetAddressByIdAsync(int id);
-        Task UpdateAddressAsync(Address Address);
+        Task UpdateAddressAsync(AddressDTO modelDTO);
         Task DeleteAddressAsync(int id);
-        Task AddAddressAsync(AddressDTO address);
+        Task<int> AddAddressAsync(AddressDTO modelDTO);
     }
 }

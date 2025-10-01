@@ -24,11 +24,11 @@ namespace Social_Media.DAL
             return await _context.friendRequests.FirstOrDefaultAsync(p => p.ID == id);
         }
 
-        public async Task<List<FriendRequest>> GetFriendRequestByUserID(string id)
+        public async Task<IEnumerable<FriendRequest>> GetFriendRequestByUserID(string id)
         {
             return await _context.friendRequests.Where(f => f.SenderID == id || f.ReceiverID == id).ToListAsync();
         }
-        public async Task<List<FriendRequest>> GetFriendRequestByReceiverID(string userId)
+        public async Task<IEnumerable<FriendRequest>> GetFriendRequestByReceiverID(string userId)
         {
             return await _context.friendRequests.Where(f => f.ReceiverID == userId && f.status == 1).ToListAsync();
         }

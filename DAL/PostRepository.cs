@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Social_Media.Models;
 using Social_Media.Models.DTO;
+using Social_Media.Models.DTO.Comment;
 using System.Drawing.Printing;
 
 namespace Social_Media.DAL

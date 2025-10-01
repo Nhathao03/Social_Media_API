@@ -36,20 +36,25 @@ namespace Social_Media
             builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // Register the PostRepository and PostService after DbContext
-            builder.Services.AddScoped<PostRepository>();
-            builder.Services.AddScoped<PostCategoryRepository>();
-            builder.Services.AddScoped<UserRepository>();
-            builder.Services.AddScoped<PostImageRepository>();
-            builder.Services.AddScoped<CommentRepository>();
-            builder.Services.AddScoped<RoleCheckRepository>();
-            builder.Services.AddScoped<RoleRepository>();
-            builder.Services.AddScoped<LikeRepository>();
-            builder.Services.AddScoped<AddressRepository>();
-            builder.Services.AddScoped<TypeFriendsRepository>();
-            builder.Services.AddScoped<FriendRequestRepository>();
-            builder.Services.AddScoped<FriendRepository>();
-            builder.Services.AddScoped<MessageRepository>();
+            // Register the Repository and Service after DbContext
+            // Repository
+            builder.Services.AddScoped<IPostRepository, PostRepository>();
+            builder.Services.AddScoped<IPostCategoryRepository, PostCategoryRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IPostImageRepository, PostImageRepository>();
+            builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+            builder.Services.AddScoped<IRoleCheckRepository, RoleCheckRepository>();
+            builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+            builder.Services.AddScoped<ILikeRepository, LikeRepository>();
+            builder.Services.AddScoped<IAddressRepository, AddressRepository>();
+            builder.Services.AddScoped<ITypeFriendsRepository, TypeFriendsRepository>();
+            builder.Services.AddScoped<IFriendRequestRepository, FriendRequestRepository>();
+            builder.Services.AddScoped<IFriendRepository, FriendRepository>();
+            builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+            builder.Services.AddScoped<ISearchRepository, SearchRepository>();
+            builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+            builder.Services.AddScoped<IReportRepository, ReportRepository>();
+            //Service
             builder.Services.AddScoped<IPostService, PostService>();
             builder.Services.AddScoped<IPostCategoryService, PostCategoryService>();
             builder.Services.AddScoped<IUserService, UserService>();
@@ -63,6 +68,9 @@ namespace Social_Media
             builder.Services.AddScoped<IFriendRequestService, FriendRequestService>();
             builder.Services.AddScoped<IFriendsService, FriendService>();
             builder.Services.AddScoped<IMessageService, MessageService>();
+            builder.Services.AddScoped<ISearchService, SearchService>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
+            builder.Services.AddScoped<IReportService, ReportService>();
 
             // Add Identity services
             builder.Services.AddScoped<EmailService>();
@@ -73,6 +81,7 @@ namespace Social_Media
             builder.Services.AddResponseCaching(); //Response Caching
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
 
             builder.Services.AddControllersWithViews().AddNewtonsoftJson(options =>
             options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
@@ -94,7 +103,10 @@ namespace Social_Media
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.UseSwagger();
+                app.UseSwagger((c =>
+                {
+                    c.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi2_0;
+                }));
                 app.UseSwaggerUI();
             }
 

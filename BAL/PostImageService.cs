@@ -6,9 +6,9 @@ namespace Social_Media.BAL
 {
     public class PostImageService : IPostImageService
     {
-        private readonly PostImageRepository _repository;
+        private readonly IPostImageRepository _repository;
 
-        public PostImageService(PostImageRepository repository)
+        public PostImageService(IPostImageRepository repository)
         {
             _repository = repository;
         }

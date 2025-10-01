@@ -1,4 +1,4 @@
-﻿namespace Social_Media.Models.DTO
+﻿namespace Social_Media.Models.DTO.AccountUser
 {
     public class RegisterDTO
     {

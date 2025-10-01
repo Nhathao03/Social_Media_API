@@ -1,5 +1,6 @@
 ﻿using Social_Media.Models;
 using Social_Media.Models.DTO;
+using Social_Media.Models.DTO.RoleCheck;
 
 namespace Social_Media.BAL
 {
@@ -7,9 +8,9 @@ namespace Social_Media.BAL
     {
         Task<IEnumerable<RoleCheck>> GetAllRoleCheckAsync();
         Task<RoleCheck> GetRoleCheckByIdAsync(int id);
-        Task AddRoleCheckAsync(RoleCheck roleCheck);
-        Task UpdateRoleCheckAsync(RoleCheck roleCheck);
+        Task AddRoleCheckAsync(RoleCheckDTO roleCheck);
+        Task UpdateRoleCheckAsync(RoleCheckDTO roleCheck);
         Task DeleteRoleCheckAsync(int id);
-        Task<bool> IsAdminAsync(string userId);
-    }
+        Task DeleteRoleCheckByUserIdAsync(string userId);
+        Task<bool> IsAdminAsync(string userId);    }
 }

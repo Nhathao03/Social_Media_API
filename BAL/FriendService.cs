@@ -8,11 +8,11 @@ namespace Social_Media.BAL
 {
     public class FriendService : IFriendsService
     {
-        private readonly FriendRepository _FriendRepository;
-        private readonly FriendRequestRepository _FriendRequestRepository;
+        private readonly IFriendRepository _FriendRepository;
+        private readonly IFriendRequestRepository _FriendRequestRepository;
 
-        public FriendService(FriendRepository repository,
-            FriendRequestRepository friendRequestRepository)
+        public FriendService(IFriendRepository repository,
+            IFriendRequestRepository friendRequestRepository)
         {
             _FriendRepository = repository;
             _FriendRequestRepository = friendRequestRepository;
@@ -41,9 +41,16 @@ namespace Social_Media.BAL
             await _FriendRepository.AddFriend(data);
         }
 
-        public async Task UpdateFriendsAsync(Friends Friends)
+        public async Task UpdateFriendsAsync(FriendDTO modelDTO)
         {
-            await _FriendRepository.UpdateFriend(Friends);
+            var Friend = await _FriendRepository.GetFriendById(modelDTO.Id);
+            if (Friend == null)
+            {
+                throw new KeyNotFoundException($"Friend with ID {modelDTO.Id} not found.");
+            }
+            Friend.FriendID = modelDTO.FriendID;
+            Friend.UserID = modelDTO.userID;
+            await _FriendRepository.UpdateFriend(Friend);
         }
 
         public async Task DeleteFriendsAsync(int id)
@@ -51,22 +58,22 @@ namespace Social_Media.BAL
             await _FriendRepository.DeleteFriend(id);
         }
 
-        public async Task<List<Friends>> GetFriendsByUserIDAsync(string userID)
+        public async Task<IEnumerable<Friends>> GetFriendsByUserIDAsync(string userID)
         {
             return await _FriendRepository.GetFriendsByUserID(userID);
         }
 
-        public async Task<List<Friends>> getFriendRecentlyAdded(string userID)
+        public async Task<IEnumerable<Friends>> getFriendRecentlyAdded(string userID)
         {
            return await _FriendRepository.getFriendRecentlyAdded(userID);
         }
 
-        public async Task<List<string>> getFriendOfEachUser(string userId)
+        public async Task<IEnumerable<string>> getFriendOfEachUser(string userId)
         {
             return await _FriendRepository.GetFriendOfEachUser(userId);
         }
 
-        public async Task<List<Friends>> GetFriendBaseOnHomeTown(string userId)
+        public async Task<IEnumerable<Friends>> GetFriendBaseOnHomeTown(string userId)
         {
             return await _FriendRepository.GetFriendBaseOnHomeTown(userId);
         }

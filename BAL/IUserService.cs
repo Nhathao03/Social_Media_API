@@ -1,5 +1,4 @@
 ﻿using Social_Media.Models;
-using Social_Media.Models.DTO;
 using Social_Media.Models.DTO.AccountUser;
 
 namespace Social_Media.BAL
@@ -10,8 +9,7 @@ namespace Social_Media.BAL
         Task<User> GetUserByIdAsync(string id);
         Task UpdateUserAsync(User user);
         Task DeleteUserAsync(string id);
-        Task RegisterAccountAsync (RegisterDTO registerDTO);
-        Task<List<User>> FindUserAsync(string stringData, string CurrentUserIdSearch);
+        Task<AuthResultDTO> RegisterAccountAsync (RegisterDTO registerDTO);
         Task UpdatePersonalInformation (PersonalInformationDTO personalInformationDTO);
         Task ChangePassword(ChangePasswordDTO changePasswordDTO);
         Task ManageContact(ManageContactDTO manageContactDTO);
@@ -19,5 +17,6 @@ namespace Social_Media.BAL
         Task<bool> IsEmailExistsAsync(string email);
         Task<bool> IsPhoneExistsAsync(string phoneNumber);
         Task<User> GetUserByEmailAsync(string email);
+        Task<AuthResultDTO> LoginAsync(LoginDTO model);
     }
 }

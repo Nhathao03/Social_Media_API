@@ -6,9 +6,9 @@ namespace Social_Media.BAL
 {
     public class LikeService : ILikeService
     {
-        private readonly LikeRepository _likeRepository;
+        private readonly ILikeRepository _likeRepository;
 
-        public LikeService(LikeRepository repository)
+        public LikeService(ILikeRepository repository)
         {
             _likeRepository = repository;
         }
@@ -35,8 +35,12 @@ namespace Social_Media.BAL
             await _likeRepository.AddLike(likeData);
         }
 
-        public async Task UpdateLikeAsync(Like like)
+        public async Task UpdateLikeAsync(LikeDTO modelDTO)
         {
+            var like = await _likeRepository.GetLikeById(modelDTO.Id);
+            if (like == null) throw new Exception("Like not found");
+            like.Likes++;
+
             await _likeRepository.UpdateLike(like);
         }
 
