@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Social_Media.BAL;
-using Social_Media.Models.DTO;
-using Social_Media.Models;
+using SocialMedia.Core.Services;
+using SocialMedia.Core.Entities.DTO;
+using SocialMedia.Core.Entities;
 
 namespace Social_Media.Controllers
 {

@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Social_Media", "Social_Media.csproj", "{041BD7D6-03C3-45BE-98E3-DD77F6B4250B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Social_Media", "Social_Media.csproj", "{041BD7D6-03C3-45BE-98E3-DD77F6B4250B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SocialMedia.Core", "..\SocialMedia.Core\SocialMedia.Core.csproj", "{A997C9BC-6EE5-4AE6-8D74-85E339EE1F53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocialMedia.Infrastructure", "..\SocialMedia.Infrastructure\SocialMedia.Infrastructure.csproj", "{B9C7E48C-2322-4F99-9B90-2671C12C1539}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{041BD7D6-03C3-45BE-98E3-DD77F6B4250B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{041BD7D6-03C3-45BE-98E3-DD77F6B4250B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{041BD7D6-03C3-45BE-98E3-DD77F6B4250B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A997C9BC-6EE5-4AE6-8D74-85E339EE1F53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A997C9BC-6EE5-4AE6-8D74-85E339EE1F53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A997C9BC-6EE5-4AE6-8D74-85E339EE1F53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A997C9BC-6EE5-4AE6-8D74-85E339EE1F53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9C7E48C-2322-4F99-9B90-2671C12C1539}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9C7E48C-2322-4F99-9B90-2671C12C1539}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9C7E48C-2322-4F99-9B90-2671C12C1539}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9C7E48C-2322-4F99-9B90-2671C12C1539}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

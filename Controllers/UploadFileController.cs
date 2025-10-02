@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Social_Media.BAL;
+using SocialMedia.Core.Services;
 
 namespace Social_Media.Controllers
 {

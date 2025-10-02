@@ -1,12 +1,12 @@
 
 using Microsoft.EntityFrameworkCore;
-using Social_Media.BAL;
-using Social_Media.DAL;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+using SocialMedia.Core.Services;
+using SocialMedia.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using SocialMedia.Infrastructure.Data;
+using SocialMedia.Core.Interfaces.RepositoriesInterfaces;
 
 namespace Social_Media
 {

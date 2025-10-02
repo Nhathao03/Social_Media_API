@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Social_Media.BAL;
-using Social_Media.DAL;
+using SocialMedia.Core.Services;
+using SocialMedia.Infrastructure.Repositories;
 
 namespace Social_Media.Controllers
 {

@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Hosting;
-using Social_Media.BAL;
-using Social_Media.Models;
-using Social_Media.Models.DTO.Comment;
+using SocialMedia.Core.Services;
+using SocialMedia.Core.Entities;
+using SocialMedia.Core.Entities.DTO.Comment;
 
 namespace Social_Media.Controllers
 {

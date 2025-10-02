@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Social_Media.BAL;
-using Social_Media.Models;
-using Social_Media.Models.DTO;
-
+using SocialMedia.Core.Entities.DTO;
+using SocialMedia.Core.Services;
 namespace Social_Media.Controllers
 {
     [Route("api/address")]

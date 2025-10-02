@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Social_Media.BAL;
+using SocialMedia.Core.Services;
 using Social_Media.Helpers;
-using Social_Media.Models;
-using Social_Media.Models.DTO.AccountUser;
-using Social_Media.Models.DTO.RoleCheck;
+using SocialMedia.Core.Entities;
+using SocialMedia.Core.Entities.DTO.AccountUser;
+using SocialMedia.Core.Entities.DTO.RoleCheck;
 using Swashbuckle.AspNetCore.Annotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

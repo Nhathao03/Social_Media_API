@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Social_Media.BAL;
+using SocialMedia.Core.Services;
 using Social_Media.Helpers;
-using Social_Media.Models.DTO;
+using SocialMedia.Core.Entities.DTO;
 using static Social_Media.Helpers.Constants;
 namespace Social_Media.Controllers
 {
