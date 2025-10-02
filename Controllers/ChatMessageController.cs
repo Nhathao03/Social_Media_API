@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Social_Media.BAL;
-using Social_Media.Models;
-using Social_Media.Models.DTO;
+using SocialMedia.Core.Services;
+using SocialMedia.Core.Entities;
+using SocialMedia.Core.Entities.DTO;
 using Social_Media.Hubs;
 
 namespace Social_Media.Controllers

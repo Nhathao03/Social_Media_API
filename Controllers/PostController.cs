@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
-using Social_Media.BAL;
-using Social_Media.Models;
-using Social_Media.Models.DTO;
-using System.Drawing.Printing;
+﻿using Microsoft.AspNetCore.Mvc;
+using SocialMedia.Core.Services;
+using SocialMedia.Core.Entities.DTO;
+using SocialMedia.Core.Entities.PostEntity;
 
 
 namespace Social_Media.Controllers

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Social_Media.BAL;
-using Social_Media.Models;
+using SocialMedia.Core.Services;
+using SocialMedia.Core.Entities.PostEntity;
 
 namespace Social_Media.Controllers
 {

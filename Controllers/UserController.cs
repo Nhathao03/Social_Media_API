@@ -2,15 +2,15 @@
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Social_Media.BAL;
-using Social_Media.Models.DTO;
-using Social_Media.Models.DTO.AccountUser;
-using Social_Media.Models.Email;
+using SocialMedia.Core.Services;
+using SocialMedia.Core.Entities.DTO;
+using SocialMedia.Core.Entities.DTO.AccountUser;
+using SocialMedia.Core.Entities.Email;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using ForgotPasswordRequest = Social_Media.Models.Email.ForgotPasswordRequest;
-using ResetPasswordRequest = Social_Media.Models.Email.ResetPasswordRequest;
+using ForgotPasswordRequest = SocialMedia.Core.Entities.Email.ForgotPasswordRequest;
+using ResetPasswordRequest = SocialMedia.Core.Entities.Email.ResetPasswordRequest;
 namespace Social_Media.Controllers
 {
     [Route("api/user")]
